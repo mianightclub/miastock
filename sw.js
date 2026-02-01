@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mia-stock-v1';
+const CACHE_NAME = 'mia-stock-v2';
 const ASSETS = [
   './',
   './index.html',
