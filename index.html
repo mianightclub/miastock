@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mia Stock v10</title>
+    <title>Mia Stock v11</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="icon.svg">
@@ -19,15 +19,16 @@
             /* Colors */
             --bg-color: #f2f2f7;
             --card-bg: #ffffff;
-            --text-primary: #000000; /* Schwarz im Light Mode */
+            --text-primary: #000000; 
             --text-secondary: #8e8e93;
             --accent: #007aff;
+            --text-on-accent: #000000; /* NEU: Schwarz auf Blau im Light Mode */
             --danger: #ff3b30;
             --danger-bg: #ffe5e5;
             --warning: #ff9500;
             --success: #34c759;
             --input-bg: #e5e5ea;
-            --bar-tab-bg: #d1d1d6; /* Dunkleres Grau für Light Mode Tabs */
+            --bar-tab-bg: #d1d1d6; 
             --shadow: 0 2px 8px rgba(0,0,0,0.08);
             --radius: 12px;
             --group-header-bg: #e5e5ea;
@@ -39,6 +40,7 @@
             --text-primary: #ffffff;
             --text-secondary: #98989f;
             --accent: #0a84ff;
+            --text-on-accent: #ffffff; /* NEU: Weiß auf Blau im Dark Mode */
             --danger: #ff453a;
             --danger-bg: #2c0b0b;
             --warning: #ff9f0a;
@@ -60,19 +62,32 @@
             transition: all 0.3s;
         }
 
-        /* --- FOCUS MODE --- */
-        body.focus-mode-active { padding-bottom: 20px; }
+        /* --- FOCUS MODE (ALLES WEG WAS STÖRT) --- */
+        body.focus-mode-active { 
+            padding-bottom: 100px; /* Nur Platz für die Floating Buttons */
+            padding-top: 0;
+        }
+        
+        /* Diese Elemente werden im Fokus Modus KOMPLETT entfernt */
         body.focus-mode-active header,
         body.focus-mode-active .filter-bar,
         body.focus-mode-active .add-panel,
-        body.focus-mode-active .btn-trash-wrapper { display: none !important; }
+        body.focus-mode-active .btn-trash-wrapper { 
+            display: none !important; 
+        }
 
-        /* Focus Header Style */
+        /* Group Header klebt im Fokus Modus ganz oben */
         body.focus-mode-active .group-header {
-            top: 0; background: var(--bg-color); color: var(--accent); opacity: 1;
-            text-align: center; font-size: 1.2rem; padding: 15px;
+            top: 0; 
+            background: var(--bg-color); 
+            color: var(--accent); 
+            opacity: 1;
+            text-align: center; 
+            font-size: 1.3rem; 
+            padding: 15px;
             border-bottom: 1px solid var(--input-bg);
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            margin-top: 0;
         }
 
         header {
@@ -85,7 +100,7 @@
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         h1 { margin: 0; font-size: 1.4rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;}
 
-        /* --- TABS (FIXED CONTRAST) --- */
+        /* --- TABS --- */
         .scroll-row {
             display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px;
             scrollbar-width: none; align-items: center;
@@ -94,14 +109,14 @@
 
         .tab-btn {
             background: var(--bar-tab-bg); 
-            color: var(--text-primary); /* WICHTIG: Schwarz im Lightmode */
+            color: var(--text-primary); 
             padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;
             white-space: nowrap; border: none; cursor: pointer; opacity: 1; flex-shrink: 0;
             transition: all 0.2s;
         }
         .tab-btn.active {
             background: var(--accent); 
-            color: #ffffff; /* Immer Weiß wenn aktiv */
+            color: var(--text-on-accent); /* Hier greift der Fix für Light/Dark Text */
             box-shadow: 0 0 10px rgba(0,122,255,0.4);
         }
 
@@ -135,7 +150,6 @@
         .card-controls { display: flex; justify-content: space-between; align-items: center; }
         .btn-group { display: flex; align-items: center; gap: 6px; }
 
-        /* Buttons */
         .btn {
             width: 42px; height: 42px; border: none; border-radius: 8px;
             font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
@@ -351,11 +365,10 @@
                 deleteModeId: null,
                 currentCategory: 'Alle',
                 
-                // --- KATEGORIEN SIND JETZT DIE GRÖSSEN ---
                 categories: ['Alle', '0.2L', '0.25L', '0.33L', '0.5L', '0.7L', '1.0L', '1.5L', 'Sonstiges'],
                 
                 newItemName: '',
-                newItemCat: '0.33L', // Default
+                newItemCat: '0.33L', 
                 newBarName: '',
                 newCatName: '',
                 activeBarIndex: 0,
@@ -370,7 +383,6 @@
             activeBarName() { return this.bars[this.activeBarIndex].name; },
             displayedGroups() {
                 let items = this.bars[this.activeBarIndex].items;
-                // Abhol-Modus Filter
                 if (this.onlyShowNeeded) items = items.filter(item => item.count > 0);
 
                 if (this.currentCategory !== 'Alle') return { [this.currentCategory]: items.filter(i => i.category === this.currentCategory) };
@@ -391,64 +403,4 @@
         methods: {
             toggleTheme() { this.isDark = !this.isDark; this.applyTheme(); this.saveData(); },
             toggleFocusMode() { 
-                this.focusMode = !this.focusMode;
-                this.currentCategory = 'Alle';
-                if(!this.focusMode) this.onlyShowNeeded = false;
-            },
-            applyTheme() { const h = document.documentElement; this.isDark ? h.setAttribute('data-theme', 'dark') : h.removeAttribute('data-theme'); },
-            switchBar(i) { this.activeBarIndex = i; this.deleteModeId = null; this.resetBarMode = false; this.saveData(); },
-            openBarModal() { this.modals.bar = true; this.deleteBarConfirm = false; },
-            openCatModal() { this.modals.cat = true; },
-            addCategory() { if(this.newCatName.trim()) { this.categories.push(this.newCatName); this.newCatName=''; this.saveData(); } },
-            deleteCategory(cat) { this.categories = this.categories.filter(c => c !== cat); if(this.currentCategory === cat) this.currentCategory='Alle'; this.saveData(); },
-            increment(i) { i.count++; i.completed = false; this.saveData(); },
-            decrement(i) { if(i.count>0) i.count--; i.completed = false; this.saveData(); },
-            resetCount(i) { i.count=0; i.completed=false; this.saveData(); },
-            toggleComplete(i) { i.completed=!i.completed; this.saveData(); },
-            initDelete(i) { this.deleteModeId=i.id; },
-            cancelDelete() { this.deleteModeId=null; },
-            confirmDelete(i) { const b = this.bars[this.activeBarIndex]; b.items = b.items.filter(it => it.id !== i.id); this.deleteModeId=null; this.saveData(); },
-            
-            addNewItem() {
-                if(!this.newItemName.trim()) return;
-                this.bars[this.activeBarIndex].items.push({ 
-                    id: Date.now(), 
-                    name: this.newItemName, 
-                    count: 0, 
-                    category: this.newItemCat, 
-                    completed: false 
-                });
-                this.newItemName=''; this.saveData();
-            },
-            addBar() { if(this.newBarName.trim()) { this.bars.push({ id: 'b'+Date.now(), name: this.newBarName, items: []}); this.newBarName=''; this.modals.bar=false; this.saveData(); } },
-            handleDeleteBar() { if(!this.deleteBarConfirm) { this.deleteBarConfirm=true; } else { this.bars.splice(this.activeBarIndex, 1); this.activeBarIndex=0; this.modals.bar=false; this.saveData(); } },
-            resetAllInBar() { this.bars[this.activeBarIndex].items.forEach(i => { i.count=0; i.completed=false; }); this.resetBarMode=false; this.saveData(); },
-            
-            saveData() { localStorage.setItem('miaStockData_v10', JSON.stringify({ bars: this.bars, categories: this.categories, theme: this.isDark, activeBarIndex: this.activeBarIndex, onlyShowNeeded: this.onlyShowNeeded })); },
-            loadData() {
-                const s = localStorage.getItem('miaStockData_v10');
-                if(s) { 
-                    const p = JSON.parse(s); 
-                    this.bars = p.bars; 
-                    this.isDark = p.theme; 
-                    this.activeBarIndex = p.activeBarIndex||0; 
-                    if(p.categories) this.categories=p.categories; 
-                    this.onlyShowNeeded = p.onlyShowNeeded || false;
-                }
-                else { 
-                    // --- NEUE START-DATEN ---
-                    this.bars[0].items = [
-                        { id: 1, name: 'Despo', count: 0, category: '0.33L', completed: false },
-                        { id: 2, name: 'Chiemseer', count: 0, category: '0.5L', completed: false },
-                        { id: 3, name: 'Cola', count: 0, category: '0.2L', completed: false },
-                        { id: 4, name: 'Cola', count: 0, category: '1.0L', completed: false }
-                    ]; 
-                }
-                this.applyTheme();
-            }
-        },
-        mounted() { this.loadData(); }
-    }).mount('#app');
-</script>
-</body>
-</html>
+                this.focusMode = !this.
