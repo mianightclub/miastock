@@ -3,270 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mia Stock v13</title>
+    <title>Mia Stock</title>
     
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/svg+xml" href="icon.svg">
-    <link rel="apple-touch-icon" href="icon.svg">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png"> <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
+        /* --- CSS IST GLEICH GEBLIEBEN WIE IN V13 --- */
         :root {
-            /* Farben */
-            --bg-color: #f2f2f7;
-            --card-bg: #ffffff;
-            --text-primary: #000000; 
-            --text-secondary: #8e8e93;
-            --accent: #007aff;
-            --text-on-accent: #ffffff; /* Immer weiß auf Blau für besseren Kontrast */
-            --danger: #ff3b30;
-            --danger-bg: #ffe5e5;
-            --warning: #ff9500;
-            --success: #34c759;
-            --input-bg: #e5e5ea;
-            --bar-tab-bg: #d1d1d6; 
-            --shadow: 0 2px 8px rgba(0,0,0,0.08);
-            --radius: 12px;
-            --group-header-bg: #e5e5ea;
-            
-            /* Layout Variablen für Animation */
-            --header-height: 140px; /* Geschätzte Höhe von Header + Filter */
+            --bg-color: #f2f2f7; --card-bg: #ffffff; --text-primary: #000000; --text-secondary: #8e8e93;
+            --accent: #007aff; --text-on-accent: #ffffff; --danger: #ff3b30; --danger-bg: #ffe5e5;
+            --warning: #ff9500; --success: #34c759; --input-bg: #e5e5ea; --bar-tab-bg: #d1d1d6; 
+            --shadow: 0 2px 8px rgba(0,0,0,0.08); --radius: 12px; --group-header-bg: #e5e5ea;
         }
-
         [data-theme="dark"] {
-            --bg-color: #000000;
-            --card-bg: #1c1c1e;
-            --text-primary: #ffffff;
-            --text-secondary: #98989f;
-            --accent: #0a84ff;
-            --text-on-accent: #ffffff;
-            --danger: #ff453a;
-            --danger-bg: #2c0b0b;
-            --warning: #ff9f0a;
-            --success: #30d158;
-            --input-bg: #2c2c2e;
-            --bar-tab-bg: #3a3a3c;
-            --shadow: 0 4px 12px rgba(0,0,0,0.4);
-            --group-header-bg: #121212;
+            --bg-color: #000000; --card-bg: #1c1c1e; --text-primary: #ffffff; --text-secondary: #98989f;
+            --accent: #0a84ff; --text-on-accent: #ffffff; --danger: #ff453a; --danger-bg: #2c0b0b;
+            --warning: #ff9f0a; --success: #30d158; --input-bg: #2c2c2e; --bar-tab-bg: #3a3a3c;
+            --shadow: 0 4px 12px rgba(0,0,0,0.4); --group-header-bg: #121212;
         }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
+            background-color: var(--bg-color); color: var(--text-primary);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0; padding: 0;
-            padding-bottom: 160px; /* Platz für Footer im Normalmodus */
-            overscroll-behavior-y: none;
-            -webkit-tap-highlight-color: transparent;
-            transition: padding-bottom 0.4s ease; /* Sanfter Wechsel des Paddings */
-            overflow-x: hidden;
+            margin: 0; padding: 0; padding-bottom: 160px;
+            overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent;
+            transition: padding-bottom 0.4s ease; overflow-x: hidden;
         }
-
-        /* --- FOKUS MODUS ANIMATIONEN --- */
+        body.focus-mode-active { padding-bottom: 20px; }
         
-        /* Wenn Fokus aktiv: Weniger Padding unten (Footer ist weg) */
-        body.focus-mode-active {
-            padding-bottom: 20px;
-        }
-
-        /* Header Wrapper Animation (Fährt nach oben weg) */
-        .top-section-wrapper {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background-color: var(--bg-color);
-        }
-
-        body.focus-mode-active .top-section-wrapper {
-            transform: translateY(-100%); /* Schiebt alles komplett nach oben raus */
-        }
-
-        /* Add Panel Animation (Fährt nach unten weg) */
+        /* Animationen */
+        .top-section-wrapper { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: sticky; top: 0; z-index: 100; background-color: var(--bg-color); }
+        body.focus-mode-active .top-section-wrapper { transform: translateY(-100%); }
         .add-panel {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: var(--card-bg);
+            position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card-bg);
             padding: 10px 15px 30px 15px; border-top: 1px solid var(--input-bg);
-            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
-            z-index: 200; box-sizing: border-box;
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap; z-index: 200; box-sizing: border-box;
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        body.focus-mode-active .add-panel {
-            transform: translateY(100%); /* Schiebt Footer nach unten raus */
-        }
-
-        /* Liste rutscht nach oben, wenn Header weg ist */
-        .item-list {
-            padding: 5px 15px;
-            transition: margin-top 0.4s ease;
-        }
+        body.focus-mode-active .add-panel { transform: translateY(100%); }
+        .item-list { padding: 5px 15px; transition: margin-top 0.4s ease; }
+        body.focus-mode-active .item-list { margin-top: -110px; }
         
-        body.focus-mode-active .item-list {
-            margin-top: -110px; /* Zieht die Liste nach oben in den freien Platz */
-        }
-
-        /* Group Header Anpassung im Fokus Modus */
         .group-header {
             background: var(--group-header-bg); color: var(--text-secondary);
             font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;
             padding: 8px 15px; margin-top: 20px; margin-bottom: 10px;
-            border-radius: 8px; position: sticky; top: 125px; /* Normalposition unter Header */
-            z-index: 90; opacity: 0.95; backdrop-filter: blur(5px);
-            transition: all 0.4s ease;
+            border-radius: 8px; position: sticky; top: 125px; z-index: 90; 
+            opacity: 0.95; backdrop-filter: blur(5px); transition: all 0.4s ease;
         }
-
         body.focus-mode-active .group-header {
-            top: 0; /* Klebt jetzt ganz oben am Bildschirmrand */
-            border-radius: 0;
-            margin-top: 0;
-            background: var(--bg-color);
-            color: var(--accent);
-            border-bottom: 1px solid var(--input-bg);
-            padding: 15px;
-            text-align: center;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            top: 0; border-radius: 0; margin-top: 0; background: var(--bg-color);
+            color: var(--accent); border-bottom: 1px solid var(--input-bg);
+            padding: 15px; text-align: center; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* --- STANDARD STYLES --- */
-        header {
-            background-color: var(--card-bg);
-            padding: 15px 15px 5px 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
+        /* Standard UI */
+        header { background-color: var(--card-bg); padding: 15px 15px 5px 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         h1 { margin: 0; font-size: 1.4rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;}
-
-        /* Scroll Rows (Tabs) */
-        .scroll-row {
-            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px;
-            scrollbar-width: none; align-items: center;
-        }
+        .scroll-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; align-items: center; }
         .scroll-row::-webkit-scrollbar { display: none; }
-
         .tab-btn {
-            background: var(--bar-tab-bg); 
-            color: var(--text-primary); 
-            padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;
-            white-space: nowrap; border: none; cursor: pointer; opacity: 1; flex-shrink: 0;
-            transition: all 0.2s;
+            background: var(--bar-tab-bg); color: var(--text-primary); padding: 6px 14px; border-radius: 20px;
+            font-size: 0.85rem; font-weight: 600; white-space: nowrap; border: none; cursor: pointer; opacity: 1; flex-shrink: 0; transition: all 0.2s;
         }
-        .tab-btn.active {
-            background: var(--accent); 
-            color: var(--text-on-accent) !important; /* Erzwingt weiße Schrift auf Blau */
-            box-shadow: 0 0 10px rgba(0,122,255,0.4);
-        }
-
-        .manage-btn {
-            background: transparent; border: 1px solid var(--text-secondary); color: var(--text-primary);
-            width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer;
-        }
-
+        .tab-btn.active { background: var(--accent); color: var(--text-on-accent) !important; box-shadow: 0 0 10px rgba(0,122,255,0.4); }
+        .manage-btn { background: transparent; border: 1px solid var(--text-secondary); color: var(--text-primary); width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        
         /* Cards */
-        .card {
-            background-color: var(--card-bg); margin-bottom: 12px; border-radius: var(--radius);
-            padding: 10px; box-shadow: var(--shadow);
-            display: flex; flex-direction: column; gap: 8px;
-            border-left: 4px solid transparent; min-height: 85px; justify-content: center;
-            transition: background-color 0.2s;
-        }
+        .card { background-color: var(--card-bg); margin-bottom: 12px; border-radius: var(--radius); padding: 10px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; border-left: 4px solid transparent; min-height: 85px; justify-content: center; transition: background-color 0.2s; }
         .card.delete-mode { background-color: var(--danger-bg); border-left-color: var(--danger); }
         .card.active-count { border-left-color: var(--accent); background: linear-gradient(90deg, rgba(0,122,255,0.05) 0%, rgba(0,0,0,0) 100%); }
         .card.completed { opacity: 0.5; border-left-color: var(--success); }
         .card-header { font-weight: 700; font-size: 1.1rem; color: var(--text-primary); word-wrap: break-word; line-height: 1.3; }
         .card-controls { display: flex; justify-content: space-between; align-items: center; }
         .btn-group { display: flex; align-items: center; gap: 6px; }
-
-        /* Buttons Small */
-        .btn {
-            width: 42px; height: 42px; border: none; border-radius: 8px;
-            font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: transform 0.1s;
-        }
+        .btn { width: 42px; height: 42px; border: none; border-radius: 8px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s; }
         .btn:active { transform: scale(0.92); }
-        .btn-trash { background: transparent; color: var(--text-secondary); width: 30px;}
-        .btn-trash:active { color: var(--danger); }
-        .btn-trash-wrapper { display: block; transition: opacity 0.3s; } /* Wrapper für Animation */
-        body.focus-mode-active .btn-trash-wrapper { display: none; } /* Mülltonne im Fokus weg */
-
-        .btn-reset { background: var(--input-bg); color: var(--warning); }
-        .btn-minus { background: var(--input-bg); color: var(--text-primary); }
-        .btn-plus { background: var(--accent); color: white; }
-        .btn-check { background: var(--input-bg); color: var(--text-secondary); }
-        .btn-check.is-done { background: var(--success); color: white; }
-        
-        .btn-confirm-delete { background: var(--danger); color: white; width: 38px; height: 38px; }
-        .btn-cancel-delete { background: var(--input-bg); color: var(--text-primary); width: 38px; height: 38px; }
+        .btn-trash { background: transparent; color: var(--text-secondary); width: 30px;} .btn-trash:active { color: var(--danger); }
+        .btn-trash-wrapper { display: block; transition: opacity 0.3s; }
+        body.focus-mode-active .btn-trash-wrapper { display: none; }
+        .btn-reset { background: var(--input-bg); color: var(--warning); } .btn-minus { background: var(--input-bg); color: var(--text-primary); } .btn-plus { background: var(--accent); color: white; } .btn-check { background: var(--input-bg); color: var(--text-secondary); } .btn-check.is-done { background: var(--success); color: white; }
+        .btn-confirm-delete { background: var(--danger); color: white; width: 38px; height: 38px; } .btn-cancel-delete { background: var(--input-bg); color: var(--text-primary); width: 38px; height: 38px; }
         .delete-text { color: var(--danger); font-weight: bold; text-align: center; flex-grow: 1; font-size: 0.95rem; text-transform: uppercase; }
         .count-display { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); min-width: 40px; text-align: center; }
-
+        
         /* Inputs */
         .input-clean { background: var(--input-bg); border: none; color: var(--text-primary); padding: 10px; border-radius: 8px; flex: 1; outline: none; min-width: 100px; }
         .input-select { background: var(--input-bg); border: none; color: var(--text-primary); padding: 0 5px; border-radius: 8px; outline: none; height: 40px; font-size: 0.85rem; font-weight: 600; }
         .btn-add { background: var(--text-primary); color: var(--bg-color); border: none; width: 40px; height: 40px; border-radius: 8px; font-size: 1.2rem; flex-shrink: 0; }
-
+        
         /* Modals */
         .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 500; display: flex; align-items: center; justify-content: center; }
         .modal { background: var(--card-bg); padding: 20px; border-radius: var(--radius); width: 85%; max-width: 350px; max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column; }
         .modal h3 { margin-top:0; margin-bottom: 15px; }
         .modal-btn { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-close { background: var(--input-bg); color: var(--text-primary); margin-top: 15px;}
-        .btn-save { background: var(--accent); color: white; }
-        .btn-danger { background: var(--input-bg); color: var(--danger); border: 1px solid var(--danger); transition: all 0.2s;}
-        .btn-danger.confirm-state { background: var(--danger); color: white; }
-        
+        .btn-close { background: var(--input-bg); color: var(--text-primary); margin-top: 15px;} .btn-save { background: var(--accent); color: white; }
+        .btn-danger { background: var(--input-bg); color: var(--danger); border: 1px solid var(--danger); transition: all 0.2s;} .btn-danger.confirm-state { background: var(--danger); color: white; }
         .reset-box { margin: 40px 0 20px 0; text-align: center; display: flex; justify-content: center; gap: 10px; }
-
-        /* Header Icons */
         .header-icon-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: var(--text-primary); font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-        .header-icon-btn:active { background: var(--input-bg); }
-        .focus-active-icon { color: var(--accent); background: var(--input-bg); }
-
+        .header-icon-btn:active { background: var(--input-bg); } .focus-active-icon { color: var(--accent); background: var(--input-bg); }
+        
         /* Floating Buttons */
-        .floating-btn-container {
-            position: fixed; bottom: 20px; width: 100%; left:0;
-            display: flex; justify-content: space-between; padding: 0 20px;
-            box-sizing: border-box; pointer-events: none; z-index: 999;
-            /* Fade in effect */
-            opacity: 0; animation: fadeIn 0.5s forwards 0.3s;
-        }
+        .floating-btn-container { position: fixed; bottom: 20px; width: 100%; left:0; display: flex; justify-content: space-between; padding: 0 20px; box-sizing: border-box; pointer-events: none; z-index: 999; opacity: 0; animation: fadeIn 0.5s forwards 0.3s; }
         @keyframes fadeIn { to { opacity: 1; } }
-
-        .float-btn {
-            width: 55px; height: 55px; border-radius: 50%;
-            background: rgba(0,0,0,0.8); color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: auto; transition: all 0.2s;
-        }
-        .float-btn:active { transform: scale(0.9); }
-        .float-btn.active-fetch { background: var(--success); color: #000; border: none; transform: scale(1.1); }
+        .float-btn { width: 55px; height: 55px; border-radius: 50%; background: rgba(0,0,0,0.8); color: white; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: auto; transition: all 0.2s; }
+        .float-btn:active { transform: scale(0.9); } .float-btn.active-fetch { background: var(--success); color: #000; border: none; transform: scale(1.1); }
     </style>
 </head>
 <body :class="{ 'focus-mode-active': focusMode }">
 
 <div id="app">
-    
     <div class="top-section-wrapper">
         <header>
             <div class="top-row">
                 <h1>Mia Stock</h1>
                 <div style="display:flex; gap: 5px;">
-                    <button class="header-icon-btn" :class="{ 'focus-active-icon': onlyShowNeeded }" @click="onlyShowNeeded = !onlyShowNeeded">
-                        <i class="fas" :class="onlyShowNeeded ? 'fa-clipboard-check' : 'fa-list'"></i>
-                    </button>
-                    <button class="header-icon-btn" :class="{ 'focus-active-icon': focusMode }" @click="enterFocusMode">
-                        <i class="fas fa-lock-open"></i>
-                    </button>
-                    <button class="header-icon-btn" @click="toggleTheme">
-                        <i class="fas" :class="isDark ? 'fa-sun' : 'fa-moon'"></i>
-                    </button>
+                    <button class="header-icon-btn" :class="{ 'focus-active-icon': onlyShowNeeded }" @click="onlyShowNeeded = !onlyShowNeeded"><i class="fas" :class="onlyShowNeeded ? 'fa-clipboard-check' : 'fa-list'"></i></button>
+                    <button class="header-icon-btn" :class="{ 'focus-active-icon': focusMode }" @click="enterFocusMode"><i class="fas fa-lock-open"></i></button>
+                    <button class="header-icon-btn" @click="toggleTheme"><i class="fas" :class="isDark ? 'fa-sun' : 'fa-moon'"></i></button>
                 </div>
             </div>
             <div class="scroll-row">
@@ -274,7 +134,6 @@
                 <button class="manage-btn" @click="openBarModal"><i class="fas fa-pen"></i></button>
             </div>
         </header>
-
         <div class="filter-bar" style="background: var(--bg-color); padding: 10px 15px;">
             <div class="scroll-row">
                 <button v-for="cat in categories" :key="cat" class="tab-btn" style="background: var(--card-bg);" :class="{ active: currentCategory === cat }" @click="currentCategory = cat">{{ cat }}</button>
@@ -285,19 +144,13 @@
 
     <div class="item-list">
         <template v-for="(groupItems, groupName) in displayedGroups" :key="groupName">
-            
-            <div v-if="currentCategory === 'Alle' && groupItems.length > 0" class="group-header">
-                {{ groupName }}
-            </div>
-
+            <div v-if="currentCategory === 'Alle' && groupItems.length > 0" class="group-header">{{ groupName }}</div>
             <div v-for="item in groupItems" :key="item.id" class="card" :class="{ completed: item.completed, 'active-count': item.count > 0 && deleteModeId !== item.id, 'delete-mode': deleteModeId === item.id }">
                 <template v-if="deleteModeId !== item.id">
                     <div class="card-header">{{ item.name }}</div>
                     <div class="card-controls">
                         <div class="btn-group">
-                            <div class="btn-trash-wrapper">
-                                <button class="btn btn-trash" @click="initDelete(item)"><i class="fas fa-trash"></i></button>
-                            </div>
+                            <div class="btn-trash-wrapper"><button class="btn btn-trash" @click="initDelete(item)"><i class="fas fa-trash"></i></button></div>
                             <button class="btn btn-reset" @click="resetCount(item)"><i class="fas fa-rotate-left"></i></button>
                             <button class="btn btn-minus" @click="decrement(item)"><i class="fas fa-minus"></i></button>
                         </div>
@@ -336,13 +189,8 @@
     </div>
 
     <div v-if="focusMode" class="floating-btn-container">
-        <div class="float-btn" :class="{ 'active-fetch': clipboardMode }" @click="toggleClipboardMode">
-            <i class="fas" :class="clipboardMode ? 'fa-clipboard-check' : 'fa-list'"></i>
-        </div>
-        
-        <div class="float-btn" @click="exitFocusMode" style="background: var(--danger);">
-            <i class="fas fa-arrow-left"></i>
-        </div>
+        <div class="float-btn" :class="{ 'active-fetch': clipboardMode }" @click="toggleClipboardMode"><i class="fas" :class="clipboardMode ? 'fa-clipboard-check' : 'fa-list'"></i></div>
+        <div class="float-btn" @click="exitFocusMode" style="background: var(--danger);"><i class="fas fa-arrow-left"></i></div>
     </div>
 
     <div class="add-panel">
@@ -382,6 +230,7 @@
             <button class="modal-btn btn-close" @click="modals.cat = false">Schließen</button>
         </div>
     </div>
+
 </div>
 
 <script>
@@ -396,38 +245,103 @@
     createApp({
         data() {
             return {
-                isDark: true,
-                focusMode: false,
-                clipboardMode: false,
+                isDark: true, focusMode: false, clipboardMode: false,
                 modals: { bar: false, cat: false },
-                resetBarMode: false,
-                deleteBarConfirm: false,
-                deleteModeId: null,
+                resetBarMode: false, deleteBarConfirm: false, deleteModeId: null,
                 currentCategory: 'Alle',
-                
                 categories: ['Alle', '0.2L', '0.25L', '0.33L', '0.5L', '0.7L', '1.0L', '1.5L', 'Sonstiges'],
-                
-                newItemName: '',
-                newItemCat: '0.33L',
-                newBarName: '',
-                newCatName: '',
+                newItemName: '', newItemCat: '0.33L', newBarName: '', newCatName: '',
                 activeBarIndex: 0,
-                
-                bars: [
-                    { id: 'b1', name: 'Bar 1', items: [] }, 
-                    { id: 'b2', name: 'Bar 2', items: [] }
-                ]
+                bars: [{ id: 'b1', name: 'Bar 1', items: [] }, { id: 'b2', name: 'Bar 2', items: [] }]
             }
         },
         computed: {
             activeBarName() { return this.bars[this.activeBarIndex].name; },
             displayedGroups() {
                 let items = this.bars[this.activeBarIndex].items;
-                if (this.clipboardMode) {
-                    items = items.filter(item => item.count > 0);
-                }
+                if (this.clipboardMode) items = items.filter(item => item.count > 0);
                 if (this.currentCategory !== 'Alle') return { [this.currentCategory]: items.filter(i => i.category === this.currentCategory) };
-                
                 const groups = {};
                 this.categories.forEach(cat => {
-                    if (cat
+                    if (cat === 'Alle') return;
+                    const catItems = items.filter(i => i.category === cat);
+                    if (catItems.length > 0) groups[cat] = catItems;
+                });
+                const uncategorized = items.filter(i => !this.categories.includes(i.category));
+                if (uncategorized.length > 0) groups['Sonstiges'] = uncategorized;
+                return groups;
+            },
+            isListEmpty() { return Object.values(this.displayedGroups).every(arr => arr.length === 0); }
+        },
+        methods: {
+            toggleTheme() { this.isDark = !this.isDark; this.applyTheme(); this.saveData(); },
+            enterFocusMode() { this.focusMode = true; this.clipboardMode = false; this.currentCategory = 'Alle'; },
+            exitFocusMode() { this.focusMode = false; this.clipboardMode = false; },
+            toggleClipboardMode() { this.clipboardMode = !this.clipboardMode; },
+            applyTheme() { const h = document.documentElement; this.isDark ? h.setAttribute('data-theme', 'dark') : h.removeAttribute('data-theme'); },
+            switchBar(i) { this.activeBarIndex = i; this.deleteModeId = null; this.resetBarMode = false; this.saveData(); },
+            openBarModal() { this.modals.bar = true; this.deleteBarConfirm = false; },
+            openCatModal() { this.modals.cat = true; },
+            addCategory() { if(this.newCatName.trim()) { this.categories.push(this.newCatName); this.newCatName=''; this.saveData(); } },
+            deleteCategory(cat) { this.categories = this.categories.filter(c => c !== cat); if(this.currentCategory === cat) this.currentCategory='Alle'; this.saveData(); },
+            increment(i) { i.count++; i.completed = false; this.saveData(); },
+            decrement(i) { if(i.count>0) i.count--; i.completed = false; this.saveData(); },
+            resetCount(i) { i.count=0; i.completed=false; this.saveData(); },
+            toggleComplete(i) { i.completed=!i.completed; this.saveData(); },
+            initDelete(i) { this.deleteModeId=i.id; },
+            cancelDelete() { this.deleteModeId=null; },
+            confirmDelete(i) { const b = this.bars[this.activeBarIndex]; b.items = b.items.filter(it => it.id !== i.id); this.deleteModeId=null; this.saveData(); },
+            addNewItem() {
+                if(!this.newItemName.trim()) return;
+                this.bars[this.activeBarIndex].items.push({ id: Date.now(), name: this.newItemName, count: 0, category: this.newItemCat, completed: false });
+                this.newItemName=''; this.saveData();
+            },
+            addBar() { if(this.newBarName.trim()) { this.bars.push({ id: 'b'+Date.now(), name: this.newBarName, items: []}); this.newBarName=''; this.modals.bar=false; this.saveData(); } },
+            handleDeleteBar() { if(!this.deleteBarConfirm) { this.deleteBarConfirm=true; } else { this.bars.splice(this.activeBarIndex, 1); this.activeBarIndex=0; this.modals.bar=false; this.saveData(); } },
+            resetAllInBar() { this.bars[this.activeBarIndex].items.forEach(i => { i.count=0; i.completed=false; }); this.resetBarMode=false; this.saveData(); },
+            saveData() { localStorage.setItem('miaStockData_LIVE', JSON.stringify({ bars: this.bars, categories: this.categories, theme: this.isDark, activeBarIndex: this.activeBarIndex, clipboardMode: this.clipboardMode })); },
+            
+            // --- MIGRATIONS LOGIK ---
+            loadData() {
+                // Neuer Speicherort: miaStockData_LIVE
+                const s = localStorage.getItem('miaStockData_LIVE');
+                if(s) { 
+                    const p = JSON.parse(s); 
+                    this.bars = p.bars; 
+                    this.isDark = p.theme; 
+                    this.activeBarIndex = p.activeBarIndex||0; 
+                    if(p.categories) this.categories=p.categories; 
+                    this.clipboardMode = p.clipboardMode || false;
+                } else {
+                    // MIGRATION: Versuch alte Daten zu finden (z.B. v12 oder v13)
+                    const old13 = localStorage.getItem('miaStockData_v13');
+                    const old12 = localStorage.getItem('miaStockData_v12');
+                    
+                    const oldData = old13 || old12;
+                    
+                    if(oldData) {
+                        // Alte Daten gefunden -> Importieren!
+                        const p = JSON.parse(oldData);
+                        this.bars = p.bars;
+                        this.isDark = p.theme;
+                        if(p.categories) this.categories = p.categories;
+                        alert('Daten aus alter Version erfolgreich importiert!');
+                        this.saveData(); // Sofort als LIVE speichern
+                    } else {
+                        // Nichts gefunden -> Neue Startdaten
+                        this.bars[0].items = [
+                            { id: 1, name: 'Despo', count: 0, category: '0.33L', completed: false },
+                            { id: 2, name: 'Chiemseer', count: 0, category: '0.5L', completed: false },
+                            { id: 3, name: 'Cola', count: 0, category: '0.2L', completed: false },
+                            { id: 4, name: 'Cola', count: 0, category: '1.0L', completed: false }
+                        ];
+                    }
+                }
+                this.applyTheme();
+            }
+        },
+        mounted() { this.loadData(); }
+    }).mount('#app');
+</script>
+</body>
+</html>
