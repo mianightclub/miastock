@@ -34,20 +34,30 @@
             overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent;
             transition: padding-bottom 0.4s ease; overflow-x: hidden;
         }
+        
+        /* WICHTIG: Wenn Fokus aktiv, kein Padding unten mehr nötig, da Footer weg ist */
         body.focus-mode-active { padding-bottom: 20px; }
         
-        /* Animationen */
+        /* Animationen & Display Logic */
         .top-section-wrapper { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: sticky; top: 0; z-index: 100; background-color: var(--bg-color); }
-        body.focus-mode-active .top-section-wrapper { transform: translateY(-100%); }
+        
+        /* HIER GEÄNDERT: Header komplett ausblenden statt nur verschieben */
+        body.focus-mode-active .top-section-wrapper { display: none !important; }
+
         .add-panel {
             position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card-bg);
             padding: 10px 15px 30px 15px; border-top: 1px solid var(--input-bg);
             display: flex; gap: 8px; align-items: center; flex-wrap: wrap; z-index: 200; box-sizing: border-box;
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        body.focus-mode-active .add-panel { transform: translateY(100%); }
+        
+        /* HIER GEÄNDERT: Footer komplett ausblenden */
+        body.focus-mode-active .add-panel { display: none !important; }
+
         .item-list { padding: 5px 15px; transition: margin-top 0.4s ease; }
-        body.focus-mode-active .item-list { margin-top: -110px; }
+        
+        /* HIER GEÄNDERT: Liste startet normal, da Header weg ist (kein margin-top:-110px mehr nötig) */
+        body.focus-mode-active .item-list { margin-top: 0; padding-top: 10px; }
         
         .group-header {
             background: var(--group-header-bg); color: var(--text-secondary);
