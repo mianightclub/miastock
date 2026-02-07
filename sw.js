@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mia-stock-v6'; // Version hochgezählt
+const CACHE_NAME = 'mia-stock-v7'; // Version hochgezählt
 const ASSETS = [
   './',
   './index.html',
