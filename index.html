@@ -314,7 +314,6 @@
                 modals: { bar: false, cat: false },
                 resetBarMode: false, deleteBarConfirm: false, deleteModeId: null,
                 currentCategory: 'Alle',
-                // HIER GEÄNDERT: 0.7L durch 0.75L ersetzt
                 categories: ['Alle', '0.2L', '0.25L', '0.33L', '0.5L', '0.75L', '1.0L', '1.5L', 'Sonstiges'],
                 newItemName: '', newItemCat: '0.33L', newBarName: '', newCatName: '',
                 activeBarIndex: 0,
@@ -389,10 +388,10 @@
                         if(p.categories) this.categories = p.categories;
                         this.saveData(); 
                     } else {
-                        // --- STARTDATEN ---
+                        // --- STARTDATEN HAUPTTHEKE ---
                         this.bars[0].name = "Haupttheke";
                         this.bars[0].items = [
-                            // 0.33L Bier / Mix
+                            // 0.33L Bier / Mix / Organics
                             { id: 1, name: 'Warsteiner Pilsner', count: 0, category: '0.33L', completed: false },
                             { id: 2, name: 'Corona Extra', count: 0, category: '0.33L', completed: false },
                             { id: 3, name: 'Desperados Original', count: 0, category: '0.33L', completed: false },
@@ -400,14 +399,16 @@
                             { id: 5, name: 'Beck\'s', count: 0, category: '0.33L', completed: false },
                             { id: 6, name: 'Beck\'s Ice', count: 0, category: '0.33L', completed: false },
                             { id: 7, name: 'Heineken 0.0', count: 0, category: '0.33L', completed: false },
-                            // HIER GEÄNDERT: Winzz auf 0.33L gesetzt
                             { id: 72, name: 'Winzz Wein', count: 0, category: '0.33L', completed: false },
+                            
+                            // HIER: Red Bull Organics (0.33L)
+                            { id: 80, name: 'RB Organics Cola', count: 0, category: '0.33L', completed: false },
+                            { id: 81, name: 'RB Organics Fizzy Peach', count: 0, category: '0.33L', completed: false },
                             
                             // 0.5L Bier & Storm
                             { id: 10, name: 'Franziskaner Weißbier', count: 0, category: '0.5L', completed: false },
                             { id: 11, name: 'Franziskaner Leicht', count: 0, category: '0.5L', completed: false },
                             { id: 12, name: 'Chiemseer Hell', count: 0, category: '0.5L', completed: false },
-                            // HIER GEÄNDERT: Storm auf 0.5L gesetzt
                             { id: 71, name: 'Storm Water', count: 0, category: '0.5L', completed: false },
 
                             // 0.25L Energy & Kleinzeug
@@ -416,12 +417,13 @@
                             { id: 22, name: 'Red Bull Blue', count: 0, category: '0.25L', completed: false },
                             { id: 23, name: 'Red Bull White', count: 0, category: '0.25L', completed: false },
                             { id: 24, name: 'Red Bull Pink', count: 0, category: '0.25L', completed: false },
-                            { id: 25, name: 'Red Bull Cola', count: 0, category: '0.25L', completed: false },
-                            // HIER GEÄNDERT: Adelholzener & Schweppes auf 0.25L
+                            { id: 26, name: 'Red Bull Lila', count: 0, category: '0.25L', completed: false },
+                            { id: 27, name: 'Red Bull Fuji Apple', count: 0, category: '0.25L', completed: false },
+                            
                             { id: 40, name: 'Adelholzener Blau', count: 0, category: '0.25L', completed: false },
                             { id: 41, name: 'Adelholzener Silber', count: 0, category: '0.25L', completed: false },
                             { id: 35, name: 'Schweppes Tonic', count: 0, category: '0.25L', completed: false },
-                            { id: 36, name: 'Schweppes Lemon', count: 0, category: '0.25L', completed: false },
+                            { id: 36, name: 'Schweppes Bitter Lemon', count: 0, category: '0.25L', completed: false },
                             { id: 37, name: 'Schweppes Ginger Ale', count: 0, category: '0.25L', completed: false },
                             { id: 38, name: 'Schweppes Ginger Beer', count: 0, category: '0.25L', completed: false },
                             { id: 39, name: 'Schweppes Wildberry', count: 0, category: '0.25L', completed: false },
@@ -433,25 +435,25 @@
                             { id: 33, name: 'Sprite', count: 0, category: '0.2L', completed: false },
                             { id: 34, name: 'Mezzo Mix', count: 0, category: '0.2L', completed: false },
 
-                            // 1.0L Groß
+                            // 1.0L Groß (WOLFRA, GRANINI & CO)
                             { id: 50, name: 'Coca-Cola Groß', count: 0, category: '1.0L', completed: false },
                             { id: 51, name: 'Fanta Groß', count: 0, category: '1.0L', completed: false },
                             { id: 52, name: 'Sprite Groß', count: 0, category: '1.0L', completed: false },
-                            { id: 53, name: 'Saft Maracuja', count: 0, category: '1.0L', completed: false },
-                            { id: 54, name: 'Saft Orange', count: 0, category: '1.0L', completed: false },
-                            { id: 55, name: 'Saft Kirsche', count: 0, category: '1.0L', completed: false },
-                            { id: 56, name: 'Saft Apfel', count: 0, category: '1.0L', completed: false },
-                            { id: 57, name: 'Saft Zitrone', count: 0, category: '1.0L', completed: false },
-                            { id: 58, name: 'Saft Lime', count: 0, category: '1.0L', completed: false },
-                            { id: 59, name: 'Schweppes Lemon Groß', count: 0, category: '1.0L', completed: false },
+                            { id: 53, name: 'Wolfra Maracuja', count: 0, category: '1.0L', completed: false },
+                            { id: 54, name: 'Wolfra Orange', count: 0, category: '1.0L', completed: false },
+                            { id: 55, name: 'Wolfra Kirsche', count: 0, category: '1.0L', completed: false },
+                            { id: 56, name: 'Wolfra Apfel', count: 0, category: '1.0L', completed: false },
+                            { id: 57, name: 'Wolfra Zitrone', count: 0, category: '1.0L', completed: false },
+                            { id: 58, name: 'Granini Lime Juice', count: 0, category: '1.0L', completed: false },
+                            { id: 59, name: 'Schweppes Bitter Lemon Groß', count: 0, category: '1.0L', completed: false },
                             { id: 60, name: 'Schweppes Wildberry Groß', count: 0, category: '1.0L', completed: false },
                             { id: 61, name: 'Schweppes Tonic Groß', count: 0, category: '1.0L', completed: false },
                             
-                            // 0.75L (NEU) Wein/Sekt/Wasser
+                            // 0.75L Wein/Sekt/Wasser
                             { id: 70, name: 'Wasser Groß', count: 0, category: '0.75L', completed: false },
                             { id: 73, name: 'Inflagranti', count: 0, category: '0.75L', completed: false },
                             { id: 74, name: 'Scavi & Ray', count: 0, category: '0.75L', completed: false },
-                            { id: 75, name: 'Moet Chandon', count: 0, category: '0.75L', completed: false }
+                            { id: 75, name: 'Moët & Chandon', count: 0, category: '0.75L', completed: false }
                         ];
                     }
                 }
