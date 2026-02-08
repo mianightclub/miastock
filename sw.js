@@ -1,9 +1,9 @@
-const CACHE_NAME = 'mia-stock-v7'; // Version hochgezählt
+const CACHE_NAME = 'mia-stock-v8';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon.png', // WICHTIG: Hier laden wir jetzt das PNG!
+  './icon.png',
   'https://unpkg.com/vue@3/dist/vue.global.js',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
