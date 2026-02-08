@@ -92,11 +92,41 @@
         .card.active-count { border-left-color: var(--accent); background: linear-gradient(90deg, rgba(0,122,255,0.05) 0%, rgba(0,0,0,0) 100%); }
         .card.completed { opacity: 0.5; border-left-color: var(--success); }
         
-        /* HIER GEÄNDERT: Text zentriert */
         .card-header { font-weight: 700; font-size: 1.1rem; color: var(--text-primary); word-wrap: break-word; line-height: 1.3; text-align: center; }
         
-        .card-controls { display: flex; justify-content: space-between; align-items: center; }
-        .btn-group { display: flex; align-items: center; gap: 6px; }
+        /* --- HIER IST DIE ÄNDERUNG FÜR DIE ZENTRIERUNG --- */
+        .card-controls { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            width: 100%;
+        }
+        
+        /* Damit die Zahl in der Mitte ist, müssen beide Seiten (btn-groups) gleich viel Platz einnehmen */
+        .btn-group { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            flex: 1; /* Nimmt den gesamten verfügbaren Platz ein */
+        }
+        
+        /* Linke Gruppe: Buttons starten ganz links */
+        .btn-group:first-child { justify-content: flex-start; }
+        
+        /* Rechte Gruppe: Buttons kleben ganz rechts */
+        .btn-group:last-child { justify-content: flex-end; }
+        
+        .count-display { 
+            font-size: 1.5rem; 
+            font-weight: 800; 
+            color: var(--text-primary); 
+            min-width: 40px; 
+            text-align: center; 
+            /* Kein flex-grow, damit es genau in der Mitte zwischen den gleich großen Seitenblöcken sitzt */
+            z-index: 2;
+        }
+        /* ------------------------------------------------ */
+
         .btn { width: 42px; height: 42px; border: none; border-radius: 8px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s; }
         .btn:active { transform: scale(0.92); }
         
@@ -109,7 +139,6 @@
         .btn-reset { background: var(--input-bg); color: var(--warning); } .btn-minus { background: var(--input-bg); color: var(--text-primary); } .btn-plus { background: var(--accent); color: white; } .btn-check { background: var(--input-bg); color: var(--text-secondary); } .btn-check.is-done { background: var(--success); color: white; }
         .btn-confirm-delete { background: var(--danger); color: white; width: 38px; height: 38px; } .btn-cancel-delete { background: var(--input-bg); color: var(--text-primary); width: 38px; height: 38px; }
         .delete-text { color: var(--danger); font-weight: bold; text-align: center; flex-grow: 1; font-size: 0.95rem; text-transform: uppercase; }
-        .count-display { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); min-width: 40px; text-align: center; }
         
         /* Inputs */
         .input-clean { background: var(--input-bg); border: none; color: var(--text-primary); padding: 10px; border-radius: 8px; flex: 1; outline: none; min-width: 100px; }
@@ -140,7 +169,6 @@
         .float-btn { width: 55px; height: 55px; border-radius: 50%; background: rgba(0,0,0,0.8); color: white; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: auto; transition: all 0.2s; }
         .float-btn:active { transform: scale(0.9); } 
         
-        /* HIER GEÄNDERT: Rot statt Grün wenn aktiv */
         .float-btn.active-fetch { background: var(--danger); color: white; border: none; transform: scale(1.1); }
     </style>
 </head>
@@ -344,7 +372,6 @@
         methods: {
             toggleTheme() { this.isDark = !this.isDark; this.applyTheme(); this.saveData(); },
             enterFocusMode() { this.focusMode = true; this.clipboardMode = false; this.currentCategory = 'Alle'; },
-            // HIER GEÄNDERT: Neue Funktion für den Header-Clipboard Button
             enterClipboardFocus() { this.focusMode = true; this.clipboardMode = true; this.currentCategory = 'Alle'; },
             exitFocusMode() { this.focusMode = false; this.clipboardMode = false; },
             toggleClipboardMode() { this.clipboardMode = !this.clipboardMode; },
