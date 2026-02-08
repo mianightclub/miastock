@@ -51,23 +51,16 @@
         .item-list { padding: 5px 15px; }
 
         /* --- FOKUS OVERLAY (DAS "ZWEITE" DISPLAY) --- */
-        /* Das hier wird nur sichtbar, wenn focusMode an ist. Es liegt ÜBER allem. */
         .focus-overlay-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--bg-color);
             z-index: 800; /* Höher als Header(100) und Footer(200) */
             overflow-y: auto;
-            padding: 20px 15px 120px 15px; /* Unten Platz für Buttons */
+            padding: 10px 15px 120px 15px; /* Oben weniger Padding, da Filterbar kommt */
             box-sizing: border-box;
         }
         
-        .focus-header-marker {
-            text-align: center; color: var(--accent); font-weight: 800;
-            text-transform: uppercase; margin-bottom: 20px; letter-spacing: 1px;
-            padding-bottom: 10px; border-bottom: 1px solid var(--input-bg);
-        }
-
         /* Group Header (z.B. "0.33L") */
         .group-header {
             background: var(--group-header-bg); color: var(--text-secondary);
@@ -98,7 +91,9 @@
         .card.delete-mode { background-color: var(--danger-bg); border-left-color: var(--danger); }
         .card.active-count { border-left-color: var(--accent); background: linear-gradient(90deg, rgba(0,122,255,0.05) 0%, rgba(0,0,0,0) 100%); }
         .card.completed { opacity: 0.5; border-left-color: var(--success); }
-        .card-header { font-weight: 700; font-size: 1.1rem; color: var(--text-primary); word-wrap: break-word; line-height: 1.3; }
+        
+        /* HIER GEÄNDERT: Text zentriert */
+        .card-header { font-weight: 700; font-size: 1.1rem; color: var(--text-primary); word-wrap: break-word; line-height: 1.3; text-align: center; }
         
         .card-controls { display: flex; justify-content: space-between; align-items: center; }
         .btn-group { display: flex; align-items: center; gap: 6px; }
@@ -134,17 +129,19 @@
         .header-icon-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: var(--text-primary); font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
         .header-icon-btn:active { background: var(--input-bg); } .focus-active-icon { color: var(--accent); background: var(--input-bg); }
         
-        /* Floating Buttons - MÜSSEN DEN HÖCHSTEN Z-INDEX HABEN (über dem Overlay) */
+        /* Floating Buttons */
         .floating-btn-container { 
             position: fixed; bottom: 20px; width: 100%; left:0; 
             display: flex; justify-content: space-between; padding: 0 20px; 
             box-sizing: border-box; pointer-events: none; 
-            z-index: 1000; /* Höher als das Focus Overlay (800) */
-            opacity: 0; animation: fadeIn 0.5s forwards 0.3s; 
+            z-index: 1000; opacity: 0; animation: fadeIn 0.5s forwards 0.3s; 
         }
         @keyframes fadeIn { to { opacity: 1; } }
         .float-btn { width: 55px; height: 55px; border-radius: 50%; background: rgba(0,0,0,0.8); color: white; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: auto; transition: all 0.2s; }
-        .float-btn:active { transform: scale(0.9); } .float-btn.active-fetch { background: var(--success); color: #000; border: none; transform: scale(1.1); }
+        .float-btn:active { transform: scale(0.9); } 
+        
+        /* HIER GEÄNDERT: Rot statt Grün wenn aktiv */
+        .float-btn.active-fetch { background: var(--danger); color: white; border: none; transform: scale(1.1); }
     </style>
 </head>
 <body :class="{ 'focus-mode-active': focusMode }">
@@ -155,8 +152,8 @@
             <div class="top-row">
                 <h1>Mia Stock</h1>
                 <div style="display:flex; gap: 5px;">
-                    <button class="header-icon-btn" :class="{ 'focus-active-icon': onlyShowNeeded }" @click="onlyShowNeeded = !onlyShowNeeded"><i class="fas" :class="onlyShowNeeded ? 'fa-clipboard-check' : 'fa-list'"></i></button>
-                    <button class="header-icon-btn" :class="{ 'focus-active-icon': focusMode }" @click="enterFocusMode"><i class="fas fa-lock-open"></i></button>
+                    <button class="header-icon-btn" @click="enterClipboardFocus"><i class="fas fa-clipboard-check"></i></button>
+                    <button class="header-icon-btn" :class="{ 'focus-active-icon': focusMode }" @click="enterFocusMode"><i class="fas" :class="focusMode ? 'fa-lock' : 'fa-lock-open'"></i></button>
                     <button class="header-icon-btn" @click="toggleTheme"><i class="fas" :class="isDark ? 'fa-sun' : 'fa-moon'"></i></button>
                 </div>
             </div>
@@ -219,18 +216,10 @@
         </div>
     </div>
 
-    <div class="add-panel">
-        <div style="display:flex; width:100%; gap:8px;">
-            <input type="text" v-model="newItemName" placeholder="Getränk (z.B. Cola)" class="input-clean">
-            <select v-model="newItemCat" class="input-select" style="width: 100px;">
-                <option v-for="cat in categories.filter(c => c !== 'Alle')" :value="cat">{{ cat }}</option>
-            </select>
-            <button class="btn-add" @click="addNewItem"><i class="fas fa-plus"></i></button>
-        </div>
-    </div>
-
     <div v-if="focusMode" class="focus-overlay-container">
-        <div class="focus-header-marker">Fokus Modus</div>
+        <div class="scroll-row" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--input-bg);">
+            <button v-for="cat in categories" :key="cat" class="tab-btn" :class="{ active: currentCategory === cat }" @click="currentCategory = cat">{{ cat }}</button>
+        </div>
         
         <template v-for="(groupItems, groupName) in displayedGroups" :key="'focus-'+groupName">
             <div v-if="currentCategory === 'Alle' && groupItems.length > 0" class="group-header">{{ groupName }}</div>
@@ -268,8 +257,18 @@
     </div>
 
     <div v-if="focusMode" class="floating-btn-container">
-        <div class="float-btn" :class="{ 'active-fetch': clipboardMode }" @click="toggleClipboardMode"><i class="fas" :class="clipboardMode ? 'fa-clipboard-check' : 'fa-list'"></i></div>
+        <div class="float-btn" :class="{ 'active-fetch': clipboardMode }" @click="toggleClipboardMode"><i class="fas fa-clipboard-check"></i></div>
         <div class="float-btn" @click="exitFocusMode" style="background: var(--danger);"><i class="fas fa-arrow-left"></i></div>
+    </div>
+
+    <div class="add-panel">
+        <div style="display:flex; width:100%; gap:8px;">
+            <input type="text" v-model="newItemName" placeholder="Getränk (z.B. Cola)" class="input-clean">
+            <select v-model="newItemCat" class="input-select" style="width: 100px;">
+                <option v-for="cat in categories.filter(c => c !== 'Alle')" :value="cat">{{ cat }}</option>
+            </select>
+            <button class="btn-add" @click="addNewItem"><i class="fas fa-plus"></i></button>
+        </div>
     </div>
 
     <div v-if="modals.bar" class="modal-overlay" @click.self="modals.bar = false">
@@ -328,9 +327,7 @@
             activeBarName() { return this.bars[this.activeBarIndex].name; },
             displayedGroups() {
                 let items = this.bars[this.activeBarIndex].items;
-                // Clipboard Logik: Wenn an, nur Items > 0 zeigen
                 if (this.clipboardMode) items = items.filter(item => item.count > 0);
-                
                 if (this.currentCategory !== 'Alle') return { [this.currentCategory]: items.filter(i => i.category === this.currentCategory) };
                 const groups = {};
                 this.categories.forEach(cat => {
@@ -347,6 +344,8 @@
         methods: {
             toggleTheme() { this.isDark = !this.isDark; this.applyTheme(); this.saveData(); },
             enterFocusMode() { this.focusMode = true; this.clipboardMode = false; this.currentCategory = 'Alle'; },
+            // HIER GEÄNDERT: Neue Funktion für den Header-Clipboard Button
+            enterClipboardFocus() { this.focusMode = true; this.clipboardMode = true; this.currentCategory = 'Alle'; },
             exitFocusMode() { this.focusMode = false; this.clipboardMode = false; },
             toggleClipboardMode() { this.clipboardMode = !this.clipboardMode; },
             applyTheme() { const h = document.documentElement; this.isDark ? h.setAttribute('data-theme', 'dark') : h.removeAttribute('data-theme'); },
