@@ -1,11 +1,12 @@
-const CACHE_NAME = 'mia-stock-v13';
+const CACHE_NAME = 'mia-stock-v16';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icon.png',
   'https://unpkg.com/vue@3/dist/vue.global.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js' // WICHTIG: Bibliothek cachen
 ];
 
 self.addEventListener('install', (event) => {
