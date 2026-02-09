@@ -137,7 +137,6 @@
         .card-header { font-weight: 700; font-size: 1.1rem; color: var(--text-primary); word-wrap: break-word; line-height: 1.3; text-align: center; }
         
         /* --- SORT MODE SPECIAL LAYOUT --- */
-        /* Das hier wird aktiv, wenn man im Sortier-Modus ist */
         .sort-content-wrapper {
             display: flex;
             align-items: center;
@@ -145,8 +144,8 @@
             flex-direction: column;
             width: 100%;
             height: 100%;
-            min-height: 65px; /* Damit es nicht springt */
-            position: relative; /* Für absolute Icons */
+            min-height: 65px;
+            position: relative; 
         }
         
         .sort-icon {
@@ -280,11 +279,12 @@
         </header>
         <div class="filter-bar" style="background: var(--bg-color); padding: 10px 15px;">
             <div class="scroll-row">
-                <button v-for="cat in categories" :key="cat" class="tab-btn" style="background: var(--card-bg);" :class="{ active: currentCategory === cat }" @click="currentCategory = cat">{{ cat }}</button>
-                <button class="manage-btn" :class="{ 'active-sort': sortMode }" @click="toggleSortMode" style="margin-left: auto;">
+                <button class="manage-btn" :class="{ 'active-sort': sortMode }" @click="toggleSortMode" style="margin-right: 8px;">
                     <i class="fas fa-sort"></i>
                 </button>
-                <button class="manage-btn" @click="openCatModal"><i class="fas fa-pen"></i></button>
+                <button class="manage-btn" @click="openCatModal" style="margin-right: 8px;"><i class="fas fa-pen"></i></button>
+                
+                <button v-for="cat in categories" :key="cat" class="tab-btn" style="background: var(--card-bg);" :class="{ active: currentCategory === cat }" @click="currentCategory = cat">{{ cat }}</button>
             </div>
         </div>
     </div>
@@ -295,16 +295,13 @@
             
             <div class="sortable-list" :data-category="groupName">
                 <div v-for="item in groupItems" :key="item.id" class="card" :data-id="item.id" :class="{ completed: item.completed, 'active-count': item.count > 0 && deleteModeId !== item.id, 'delete-mode': deleteModeId === item.id }">
-                    
                     <template v-if="sortMode">
                         <div class="sort-content-wrapper">
                             <div class="sort-icon left"><i class="fas fa-bars"></i></div>
-                            
                             <div class="sort-text-group">
                                 <div class="card-header" style="text-align:center; font-size:1.1rem;">{{ item.name }}</div>
                                 <div class="sort-text-hint">Ziehen zum Sortieren</div>
                             </div>
-                            
                             <div class="sort-icon right"><i class="fas fa-bars"></i></div>
                         </div>
                     </template>
@@ -356,10 +353,11 @@
 
     <div v-if="focusMode" class="focus-overlay-container">
         <div class="scroll-row">
-            <button v-for="cat in categories" :key="cat" class="tab-btn" :class="{ active: currentCategory === cat }" @click="currentCategory = cat">{{ cat }}</button>
-            <button class="manage-btn" :class="{ 'active-sort': sortMode }" @click="toggleSortMode" style="margin-left: auto;">
+            <button class="manage-btn" :class="{ 'active-sort': sortMode }" @click="toggleSortMode" style="margin-right: 8px;">
                 <i class="fas fa-sort"></i>
             </button>
+            
+            <button v-for="cat in categories" :key="cat" class="tab-btn" :class="{ active: currentCategory === cat }" @click="currentCategory = cat">{{ cat }}</button>
         </div>
         
         <template v-for="(groupItems, groupName) in displayedGroups" :key="'focus-'+groupName">
@@ -523,10 +521,13 @@
                     const containers = document.querySelectorAll('.sortable-list');
                     containers.forEach(el => {
                         const sortable = new Sortable(el, {
-                            // KEIN HANDLE = GANZE KARTE
-                            delay: 150, // 150ms Verzögerung, damit man noch scrollen kann
+                            // OPTIMIERTES SCROLLING
+                            delay: 150, 
                             delayOnTouchOnly: true, 
                             animation: 150,
+                            scroll: true, 
+                            scrollSensitivity: 150, // Erhöht für früheres Scrollen am Rand
+                            scrollSpeed: 20,       // Erhöht für schnelleres Scrollen
                             ghostClass: 'sortable-ghost',
                             dragClass: 'sortable-drag',
                             onEnd: (evt) => {
@@ -547,19 +548,9 @@
                 itemsInCat.splice(oldIndex, 1);
                 itemsInCat.splice(newIndex, 0, movedItem);
                 
-                // Wir fügen die sortierte Kategorie zurück in die Hauptliste ein
-                // Um die Struktur zu wahren, entfernen wir alle Items dieser Kategorie und fügen sie am alten Startpunkt ein
                 const otherItems = allItems.filter(i => i.category !== catName);
-                
-                // Finde Einfügepunkt (wo das erste Item der Kategorie vorher war)
-                let insertionIndex = 0;
-                // Wir suchen den Index im original Array.
-                // Das ist etwas komplexer, wenn die Liste gemischt war. 
-                // Simple Lösung für diese App: Wir hängen die Gruppe einfach wieder zusammen an die Stelle, wo sie grob war.
-                // Wir suchen den Index des ersten Items dieser Kategorie im alten Array.
                 const firstIdx = allItems.findIndex(i => i.category === catName);
                 
-                // Nun müssen wir berechnen, wo dieser Index in `otherItems` wäre.
                 let countOthersBefore = 0;
                 for(let i=0; i<firstIdx; i++) {
                     if(allItems[i].category !== catName) countOthersBefore++;
