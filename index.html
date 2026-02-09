@@ -11,31 +11,63 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* --- GRUNDLAGEN --- */
+        /* --- DESIGN VARIABLEN --- */
         :root {
-            --bg-color: #f2f2f7; --card-bg: #ffffff; --text-primary: #000000; --text-secondary: #8e8e93;
-            --accent: #007aff; --text-on-accent: #ffffff; --danger: #ff3b30; --danger-bg: #ffe5e5;
-            --warning: #ff9500; --success: #34c759; --input-bg: #e5e5ea; --bar-tab-bg: #d1d1d6; 
-            --shadow: 0 2px 8px rgba(0,0,0,0.08); --radius: 12px; --group-header-bg: #e5e5ea;
+            --bg-color: #f2f2f7; 
+            --card-bg: #ffffff; 
+            --text-primary: #000000; 
+            --text-secondary: #8e8e93;
+            --accent: #007aff; 
+            --text-on-accent: #ffffff; 
+            --danger: #ff3b30; 
+            --danger-bg: #ffe5e5;
+            --warning: #ff9500; 
+            --success: #34c759; 
+            --input-bg: #e5e5ea; 
+            --bar-tab-bg: #d1d1d6; 
+            --radius: 14px; /* Runder */
+            --shadow: 0 2px 8px rgba(0,0,0,0.08); 
+            --group-header-bg: rgba(229, 229, 234, 0.8);
+            
+            /* Liquid Glass Light */
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --glass-blur: blur(20px);
         }
         [data-theme="dark"] {
-            --bg-color: #000000; --card-bg: #1c1c1e; --text-primary: #ffffff; --text-secondary: #98989f;
-            --accent: #0a84ff; --text-on-accent: #ffffff; --danger: #ff453a; --danger-bg: #2c0b0b;
-            --warning: #ff9f0a; --success: #30d158; --input-bg: #2c2c2e; --bar-tab-bg: #3a3a3c;
-            --shadow: 0 4px 12px rgba(0,0,0,0.4); --group-header-bg: #121212;
+            --bg-color: #000000; 
+            --card-bg: #1c1c1e; 
+            --text-primary: #ffffff; 
+            --text-secondary: #98989f;
+            --accent: #0a84ff; 
+            --text-on-accent: #ffffff; 
+            --danger: #ff453a; 
+            --danger-bg: #2c0b0b;
+            --warning: #ff9f0a; 
+            --success: #30d158; 
+            --input-bg: #2c2c2e; 
+            --bar-tab-bg: #3a3a3c;
+            --shadow: 0 4px 12px rgba(0,0,0,0.4); 
+            --group-header-bg: rgba(28, 28, 30, 0.8);
+
+            /* Liquid Glass Dark */
+            --glass-bg: rgba(44, 44, 46, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
+
         body {
             background-color: var(--bg-color); color: var(--text-primary);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0; padding: 0; padding-bottom: 160px; /* Platz für Footer */
+            margin: 0; padding: 0; padding-bottom: 160px;
             overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
         }
         
-        /* --- NORMALER MODUS LAYOUT --- */
+        /* Layout Structure */
         .top-section-wrapper { 
             position: sticky; top: 0; z-index: 100; 
             background-color: var(--bg-color); 
@@ -50,48 +82,34 @@
         }
         .item-list { padding: 5px 15px; }
 
-        /* --- FOKUS OVERLAY --- */
+        /* Focus Overlay */
         .focus-overlay-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--bg-color);
-            z-index: 800; /* Höher als Header(100) und Footer(200) */
-            overflow-y: auto;
-            /* Padding oben entfernt, da wir das jetzt im Sticky Header regeln */
+            z-index: 800; overflow-y: auto;
             padding: 0 15px 120px 15px; 
             box-sizing: border-box;
         }
-        
-        /* HIER NEU: Sticky Kategorien im Fokus Modus */
         .focus-overlay-container .scroll-row {
-            position: sticky;
-            top: 0;
-            z-index: 805; /* Ganz oben, über Group Header */
-            background-color: var(--bg-color); /* Damit man nicht durchsieht */
-            margin-bottom: 0;
-            padding: 15px 0 10px 0; /* Etwas Luft oben und unten */
+            position: sticky; top: 0; z-index: 805;
+            background-color: var(--bg-color);
+            margin-bottom: 0; padding: 15px 5px 10px 5px;
             border-bottom: 1px solid var(--input-bg);
-            margin-left: -5px; margin-right: -5px; /* Ausgleich für Container Padding */
-            padding-left: 5px;
+            margin-left: -5px; margin-right: -5px;
         }
-        
-        /* Group Header (Normal) */
+        .focus-overlay-container .group-header { top: 65px; z-index: 801; margin-top: 0; }
+
+        /* Group Header Glass */
         .group-header {
-            background: var(--group-header-bg); color: var(--text-secondary);
+            background: var(--group-header-bg); 
+            color: var(--text-secondary);
             font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;
             padding: 8px 15px; margin-top: 20px; margin-bottom: 10px;
             border-radius: 8px; position: sticky; top: 125px; z-index: 90; 
-            opacity: 0.95; backdrop-filter: blur(5px);
-        }
-        
-        /* HIER NEU: Group Header im Fokus Modus (Sticky unter der Kategorie-Leiste) */
-        .focus-overlay-container .group-header { 
-            top: 65px; /* Platz lassen für die Sticky Kategorien darüber */
-            z-index: 801; 
-            margin-top: 0;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         }
 
-        /* Standard UI */
+        /* Header UI */
         header { background-color: var(--card-bg); padding: 15px 15px 5px 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         h1 { margin: 0; font-size: 1.4rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;}
@@ -103,32 +121,78 @@
             font-size: 0.85rem; font-weight: 600; white-space: nowrap; border: none; cursor: pointer; opacity: 1; flex-shrink: 0; transition: all 0.2s;
         }
         .tab-btn.active { background: var(--accent); color: var(--text-on-accent) !important; box-shadow: 0 0 10px rgba(0,122,255,0.4); }
-        .manage-btn { background: transparent; border: 1px solid var(--text-secondary); color: var(--text-primary); width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         
-        /* Cards Styling */
-        .card { background-color: var(--card-bg); margin-bottom: 12px; border-radius: var(--radius); padding: 10px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; border-left: 4px solid transparent; min-height: 85px; justify-content: center; transition: background-color 0.2s; }
+        .manage-btn { background: transparent; border: 1px solid var(--text-secondary); color: var(--text-primary); width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+        .manage-btn.active-sort { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 0 10px rgba(0,122,255,0.4); }
+
+        /* CARDS STYLING */
+        .card { 
+            background-color: var(--card-bg); margin-bottom: 12px; border-radius: var(--radius); 
+            padding: 10px; box-shadow: var(--shadow); 
+            display: flex; flex-direction: column; gap: 8px; 
+            border-left: 4px solid transparent; min-height: 85px; justify-content: center; 
+            transition: background-color 0.2s;
+            position: relative; /* Wichtig für Drag Handle */
+        }
         .card.delete-mode { background-color: var(--danger-bg); border-left-color: var(--danger); }
         .card.active-count { border-left-color: var(--accent); background: linear-gradient(90deg, rgba(0,122,255,0.05) 0%, rgba(0,0,0,0) 100%); }
         .card.completed { opacity: 0.5; border-left-color: var(--success); }
-        
         .card-header { font-weight: 700; font-size: 1.1rem; color: var(--text-primary); word-wrap: break-word; line-height: 1.3; text-align: center; }
         
-        /* Controls */
+        /* --- SORTABLE JS STYLES --- */
+        .drag-handle {
+            display: flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: grab;
+            margin-right: 5px;
+            touch-action: none; /* Wichtig für Touch Drag */
+        }
+        .drag-handle:active { cursor: grabbing; color: var(--accent); }
+        
+        /* Das Element, das man zieht (Ghost) - Schattenvorschau */
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: var(--input-bg);
+            border: 2px dashed var(--text-secondary);
+        }
+        /* Das Element, während man es zieht */
+        .sortable-drag {
+            background-color: var(--card-bg);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            opacity: 1;
+            transform: scale(1.02);
+        }
+
+        /* Controls & Buttons (UPDATED: KLEINER & RUNDER) */
         .card-controls { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .btn-group { display: flex; align-items: center; gap: 6px; flex: 1; }
         .btn-group:first-child { justify-content: flex-start; }
         .btn-group:last-child { justify-content: flex-end; }
         .count-display { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); min-width: 40px; text-align: center; z-index: 2; }
         
-        .btn { width: 42px; height: 42px; border: none; border-radius: 8px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s; }
+        .btn { 
+            width: 34px; height: 34px; /* Kleiner */
+            border: none; border-radius: 12px; /* Stark abgerundet (Squircle) */
+            font-size: 1.0rem; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; transition: transform 0.1s; 
+        }
         .btn:active { transform: scale(0.92); }
         
         .btn-trash { background: transparent; color: var(--text-secondary); width: 30px;} .btn-trash:active { color: var(--danger); }
         .btn-trash-wrapper { display: block; transition: opacity 0.3s; }
         .focus-overlay-container .btn-trash-wrapper { display: none; }
         
-        .btn-reset { background: var(--input-bg); color: var(--warning); } .btn-minus { background: var(--input-bg); color: var(--text-primary); } .btn-plus { background: var(--accent); color: white; } .btn-check { background: var(--input-bg); color: var(--text-secondary); } .btn-check.is-done { background: var(--success); color: white; }
-        .btn-confirm-delete { background: var(--danger); color: white; width: 38px; height: 38px; } .btn-cancel-delete { background: var(--input-bg); color: var(--text-primary); width: 38px; height: 38px; }
+        .btn-reset { background: var(--input-bg); color: var(--warning); } 
+        .btn-minus { background: var(--input-bg); color: var(--text-primary); } 
+        .btn-plus { background: var(--accent); color: white; } 
+        .btn-check { background: var(--input-bg); color: var(--text-secondary); } 
+        .btn-check.is-done { background: var(--success); color: white; }
+        
+        .btn-confirm-delete { background: var(--danger); color: white; width: 38px; height: 38px; } 
+        .btn-cancel-delete { background: var(--input-bg); color: var(--text-primary); width: 38px; height: 38px; }
         .delete-text { color: var(--danger); font-weight: bold; text-align: center; flex-grow: 1; font-size: 0.95rem; text-transform: uppercase; }
         
         /* Inputs */
@@ -143,13 +207,12 @@
         .modal-btn { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .btn-close { background: var(--input-bg); color: var(--text-primary); margin-top: 15px;} .btn-save { background: var(--accent); color: white; }
         .btn-danger { background: var(--input-bg); color: var(--danger); border: 1px solid var(--danger); transition: all 0.2s;} .btn-danger.confirm-state { background: var(--danger); color: white; }
-        
         .reset-box { margin: 40px 0 20px 0; text-align: center; display: flex; justify-content: center; gap: 10px; }
         
         .header-icon-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: var(--text-primary); font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
         .header-icon-btn:active { background: var(--input-bg); } .focus-active-icon { color: var(--accent); background: var(--input-bg); }
         
-        /* Floating Buttons */
+        /* Floating Buttons - LIQUID GLASS STYLE */
         .floating-btn-container { 
             position: fixed; bottom: 20px; width: 100%; left:0; 
             display: flex; justify-content: space-between; padding: 0 20px; 
@@ -157,9 +220,29 @@
             z-index: 1000; opacity: 0; animation: fadeIn 0.5s forwards 0.3s; 
         }
         @keyframes fadeIn { to { opacity: 1; } }
-        .float-btn { width: 55px; height: 55px; border-radius: 50%; background: rgba(0,0,0,0.8); color: white; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: auto; transition: all 0.2s; }
-        .float-btn:active { transform: scale(0.9); } 
-        .float-btn.active-fetch { background: var(--danger); color: white; border: none; transform: scale(1.1); }
+        
+        .float-btn { 
+            width: 55px; height: 55px; border-radius: 50%; 
+            /* Liquid Glass Effekt */
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: var(--glass-blur); 
+            -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+            
+            color: var(--text-primary); 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.3rem; cursor: pointer; pointer-events: auto; 
+            transition: all 0.2s; 
+        }
+        .float-btn:active { transform: scale(0.95); background: var(--accent); color: white; } 
+        /* Aktiv-Status */
+        .float-btn.active-fetch { 
+            background: var(--card-bg); 
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            transform: scale(1.05); 
+            border: 1px solid var(--text-primary);
+        }
     </style>
 </head>
 <body :class="{ 'focus-mode-active': focusMode }">
@@ -183,6 +266,10 @@
         <div class="filter-bar" style="background: var(--bg-color); padding: 10px 15px;">
             <div class="scroll-row">
                 <button v-for="cat in categories" :key="cat" class="tab-btn" style="background: var(--card-bg);" :class="{ active: currentCategory === cat }" @click="currentCategory = cat">{{ cat }}</button>
+                
+                <button class="manage-btn" :class="{ 'active-sort': sortMode }" @click="toggleSortMode" style="margin-left: auto;">
+                    <i class="fas fa-sort"></i>
+                </button>
                 <button class="manage-btn" @click="openCatModal"><i class="fas fa-pen"></i></button>
             </div>
         </div>
@@ -191,30 +278,40 @@
     <div class="item-list">
         <template v-for="(groupItems, groupName) in displayedGroups" :key="'main-'+groupName">
             <div v-if="currentCategory === 'Alle' && groupItems.length > 0" class="group-header">{{ groupName }}</div>
-            <div v-for="item in groupItems" :key="item.id" class="card" :class="{ completed: item.completed, 'active-count': item.count > 0 && deleteModeId !== item.id, 'delete-mode': deleteModeId === item.id }">
-                <template v-if="deleteModeId !== item.id">
-                    <div class="card-header">{{ item.name }}</div>
-                    <div class="card-controls">
-                        <div class="btn-group">
-                            <div class="btn-trash-wrapper"><button class="btn btn-trash" @click="initDelete(item)"><i class="fas fa-trash"></i></button></div>
-                            <button class="btn btn-reset" @click="resetCount(item)"><i class="fas fa-rotate-left"></i></button>
-                            <button class="btn btn-minus" @click="decrement(item)"><i class="fas fa-minus"></i></button>
+            
+            <div class="sortable-list" :data-category="groupName">
+                <div v-for="item in groupItems" :key="item.id" class="card" :data-id="item.id" :class="{ completed: item.completed, 'active-count': item.count > 0 && deleteModeId !== item.id, 'delete-mode': deleteModeId === item.id }">
+                    <template v-if="deleteModeId !== item.id">
+                        <div class="card-header">{{ item.name }}</div>
+                        <div class="card-controls">
+                            <div v-if="sortMode" class="drag-handle">
+                                <i class="fas fa-bars"></i>
+                            </div>
+
+                            <div class="btn-group">
+                                <div class="btn-trash-wrapper" v-if="!sortMode"><button class="btn btn-trash" @click="initDelete(item)"><i class="fas fa-trash"></i></button></div>
+                                <button class="btn btn-reset" @click="resetCount(item)" v-if="!sortMode"><i class="fas fa-rotate-left"></i></button>
+                                <button class="btn btn-minus" @click="decrement(item)" v-if="!sortMode"><i class="fas fa-minus"></i></button>
+                            </div>
+                            
+                            <div class="count-display" v-if="!item.completed && !sortMode">{{ item.count }}</div>
+                            <div class="count-display" v-else-if="!sortMode" style="color:var(--success); font-size:1rem;"><i class="fas fa-check"></i></div>
+                            <div style="flex-grow:1; text-align:center; color:#888; font-size:0.8rem;" v-if="sortMode">Ziehen zum Sortieren</div>
+
+                            <div class="btn-group">
+                                <button class="btn btn-plus" @click="increment(item)" v-if="!sortMode"><i class="fas fa-plus"></i></button>
+                                <button class="btn btn-check" :class="{ 'is-done': item.completed }" @click="toggleComplete(item)" v-if="!sortMode"><i class="fas fa-check"></i></button>
+                            </div>
                         </div>
-                        <div class="count-display" v-if="!item.completed">{{ item.count }}</div>
-                        <div class="count-display" v-else style="color:var(--success); font-size:1rem;"><i class="fas fa-check"></i></div>
-                        <div class="btn-group">
-                            <button class="btn btn-plus" @click="increment(item)"><i class="fas fa-plus"></i></button>
-                            <button class="btn btn-check" :class="{ 'is-done': item.completed }" @click="toggleComplete(item)"><i class="fas fa-check"></i></button>
+                    </template>
+                    <template v-else>
+                        <div class="card-controls" style="width: 100%;">
+                            <button class="btn btn-confirm-delete" @click="confirmDelete(item)"><i class="fas fa-trash"></i></button>
+                            <div class="delete-text">Wirklich löschen?</div>
+                            <button class="btn btn-cancel-delete" @click="cancelDelete"><i class="fas fa-times"></i></button>
                         </div>
-                    </div>
-                </template>
-                <template v-else>
-                    <div class="card-controls" style="width: 100%;">
-                        <button class="btn btn-confirm-delete" @click="confirmDelete(item)"><i class="fas fa-trash"></i></button>
-                        <div class="delete-text">Wirklich löschen?</div>
-                        <button class="btn btn-cancel-delete" @click="cancelDelete"><i class="fas fa-times"></i></button>
-                    </div>
-                </template>
+                    </template>
+                </div>
             </div>
         </template>
         
@@ -223,7 +320,7 @@
             <p v-else>Keine Getränke angelegt.</p>
         </div>
         
-        <div class="reset-box">
+        <div class="reset-box" v-if="!sortMode">
             <template v-if="!resetBarMode">
                 <button @click="resetBarMode = true" style="background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 10px 20px; border-radius: 20px;"><i class="fas fa-bomb"></i> Bar "{{ activeBarName }}" nullen</button>
             </template>
@@ -237,22 +334,35 @@
     <div v-if="focusMode" class="focus-overlay-container">
         <div class="scroll-row">
             <button v-for="cat in categories" :key="cat" class="tab-btn" :class="{ active: currentCategory === cat }" @click="currentCategory = cat">{{ cat }}</button>
+            <button class="manage-btn" :class="{ 'active-sort': sortMode }" @click="toggleSortMode" style="margin-left: auto;">
+                <i class="fas fa-sort"></i>
+            </button>
         </div>
         
         <template v-for="(groupItems, groupName) in displayedGroups" :key="'focus-'+groupName">
             <div v-if="currentCategory === 'Alle' && groupItems.length > 0" class="group-header">{{ groupName }}</div>
-            <div v-for="item in groupItems" :key="item.id" class="card" :class="{ completed: item.completed, 'active-count': item.count > 0 }">
-                <div class="card-header">{{ item.name }}</div>
-                <div class="card-controls">
-                    <div class="btn-group">
-                        <button class="btn btn-reset" @click="resetCount(item)"><i class="fas fa-rotate-left"></i></button>
-                        <button class="btn btn-minus" @click="decrement(item)"><i class="fas fa-minus"></i></button>
-                    </div>
-                    <div class="count-display" v-if="!item.completed">{{ item.count }}</div>
-                    <div class="count-display" v-else style="color:var(--success); font-size:1rem;"><i class="fas fa-check"></i></div>
-                    <div class="btn-group">
-                        <button class="btn btn-plus" @click="increment(item)"><i class="fas fa-plus"></i></button>
-                        <button class="btn btn-check" :class="{ 'is-done': item.completed }" @click="toggleComplete(item)"><i class="fas fa-check"></i></button>
+            
+            <div class="sortable-list" :data-category="groupName">
+                <div v-for="item in groupItems" :key="item.id" class="card" :data-id="item.id" :class="{ completed: item.completed, 'active-count': item.count > 0 }">
+                    <div class="card-header">{{ item.name }}</div>
+                    <div class="card-controls">
+                        <div v-if="sortMode" class="drag-handle">
+                            <i class="fas fa-bars"></i>
+                        </div>
+
+                        <div class="btn-group" v-if="!sortMode">
+                            <button class="btn btn-reset" @click="resetCount(item)"><i class="fas fa-rotate-left"></i></button>
+                            <button class="btn btn-minus" @click="decrement(item)"><i class="fas fa-minus"></i></button>
+                        </div>
+                        
+                        <div class="count-display" v-if="!item.completed && !sortMode">{{ item.count }}</div>
+                        <div class="count-display" v-else-if="!sortMode" style="color:var(--success); font-size:1rem;"><i class="fas fa-check"></i></div>
+                        <div style="flex-grow:1; text-align:center; color:#888; font-size:0.8rem;" v-if="sortMode">Ziehen zum Sortieren</div>
+
+                        <div class="btn-group" v-if="!sortMode">
+                            <button class="btn btn-plus" @click="increment(item)"><i class="fas fa-plus"></i></button>
+                            <button class="btn btn-check" :class="{ 'is-done': item.completed }" @click="toggleComplete(item)"><i class="fas fa-check"></i></button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -263,7 +373,7 @@
              <p v-else>Keine Getränke angelegt.</p>
         </div>
         
-        <div class="reset-box">
+        <div class="reset-box" v-if="!sortMode">
              <template v-if="!resetBarMode">
                  <button @click="resetBarMode = true" style="background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 10px 20px; border-radius: 20px;"><i class="fas fa-bomb"></i> Bar "{{ activeBarName }}" nullen</button>
              </template>
@@ -276,7 +386,7 @@
 
     <div v-if="focusMode" class="floating-btn-container">
         <div class="float-btn" :class="{ 'active-fetch': clipboardMode }" @click="toggleClipboardMode"><i class="fas fa-clipboard-check"></i></div>
-        <div class="float-btn" @click="exitFocusMode" style="background: var(--danger);"><i class="fas fa-arrow-left"></i></div>
+        <div class="float-btn" @click="exitFocusMode"><i class="fas fa-arrow-left"></i></div>
     </div>
 
     <div class="add-panel">
@@ -325,20 +435,21 @@
         });
     }
 
-    const { createApp } = Vue;
+    const { createApp, nextTick } = Vue;
 
     createApp({
         data() {
             return {
                 isDark: true, focusMode: false, clipboardMode: false,
+                sortMode: false,
                 modals: { bar: false, cat: false },
                 resetBarMode: false, deleteBarConfirm: false, deleteModeId: null,
                 currentCategory: 'Alle',
-                // HIER GEÄNDERT: 1.5L und Sonstiges entfernt
                 categories: ['Alle', '0.2L', '0.25L', '0.33L', '0.5L', '0.75L', '1.0L'],
                 newItemName: '', newItemCat: '0.33L', newBarName: '', newCatName: '',
                 activeBarIndex: 0,
-                bars: [{ id: 'b1', name: 'Bar 1', items: [] }, { id: 'b2', name: 'Bar 2', items: [] }]
+                bars: [{ id: 'b1', name: 'Bar 1', items: [] }, { id: 'b2', name: 'Bar 2', items: [] }],
+                sortableInstances: []
             }
         },
         computed: {
@@ -359,14 +470,125 @@
             },
             isListEmpty() { return Object.values(this.displayedGroups).every(arr => arr.length === 0); }
         },
+        watch: {
+            // Wenn Sort Mode an/aus, oder Kategorie wechselt, müssen wir Sortable neu initialisieren
+            sortMode() { this.initSortables(); },
+            currentCategory() { setTimeout(this.initSortables, 100); },
+            focusMode() { setTimeout(this.initSortables, 100); }
+        },
         methods: {
             toggleTheme() { this.isDark = !this.isDark; this.applyTheme(); this.saveData(); },
-            enterFocusMode() { this.focusMode = true; this.clipboardMode = false; this.currentCategory = 'Alle'; },
-            enterClipboardFocus() { this.focusMode = true; this.clipboardMode = true; this.currentCategory = 'Alle'; },
-            exitFocusMode() { this.focusMode = false; this.clipboardMode = false; },
+            enterFocusMode() { this.focusMode = true; this.clipboardMode = false; this.currentCategory = 'Alle'; this.sortMode = false; },
+            enterClipboardFocus() { this.focusMode = true; this.clipboardMode = true; this.currentCategory = 'Alle'; this.sortMode = false; },
+            exitFocusMode() { this.focusMode = false; this.clipboardMode = false; this.sortMode = false; },
             toggleClipboardMode() { this.clipboardMode = !this.clipboardMode; },
+            toggleSortMode() { this.sortMode = !this.sortMode; this.deleteModeId = null; },
+
+            // --- SORTABLE LOGIK ---
+            initSortables() {
+                // Alte Instanzen löschen
+                this.sortableInstances.forEach(inst => inst.destroy());
+                this.sortableInstances = [];
+
+                if(!this.sortMode) return;
+
+                // DOM Updates abwarten
+                nextTick(() => {
+                    const containers = document.querySelectorAll('.sortable-list');
+                    containers.forEach(el => {
+                        const sortable = new Sortable(el, {
+                            handle: '.drag-handle',
+                            animation: 150,
+                            ghostClass: 'sortable-ghost',
+                            dragClass: 'sortable-drag',
+                            onEnd: (evt) => {
+                                const catName = el.getAttribute('data-category');
+                                this.handleSortEnd(evt.oldIndex, evt.newIndex, catName);
+                            }
+                        });
+                        this.sortableInstances.push(sortable);
+                    });
+                });
+            },
+
+            handleSortEnd(oldIndex, newIndex, catName) {
+                if(oldIndex === newIndex) return;
+
+                const allItems = this.bars[this.activeBarIndex].items;
+                
+                // Wir filtern die Items, die zu dieser Kategorie gehören, um die exakte Reihenfolge zu bestimmen
+                const itemsInCat = allItems.filter(i => i.category === catName);
+                
+                // Item identifizieren
+                const movedItem = itemsInCat[oldIndex];
+                
+                // Array neu ordnen (in der Untermenge)
+                itemsInCat.splice(oldIndex, 1);
+                itemsInCat.splice(newIndex, 0, movedItem);
+
+                // Jetzt müssen wir diese neue Reihenfolge in die Hauptliste übertragen
+                // Strategie: Wir bauen die Hauptliste neu.
+                // 1. Alle Items, die NICHT in dieser Kategorie sind, bleiben wo sie sind? 
+                // Nein, einfacher: Wir löschen alle Items dieser Kategorie aus der Hauptliste
+                // und fügen sie an der Position des ersten Vorkommens wieder ein (oder am Ende).
+                // Da der User sortiert, gruppieren wir die Items dieser Kategorie am besten zusammen.
+                
+                // 1. Index des ersten Items dieser Kategorie finden (als Einfügepunkt)
+                let firstIndex = allItems.findIndex(i => i.category === catName);
+                if(firstIndex === -1) firstIndex = allItems.length;
+
+                // 2. Alle Items dieser Kategorie aus Hauptliste entfernen
+                const otherItems = allItems.filter(i => i.category !== catName);
+                
+                // 3. Neue sortierte Items an der Stelle einfügen (oder am Ende wenn vorher verstreut)
+                // Um die Position grob zu halten: Wir fügen sie dort ein, wo das erste Item dieser Kategorie war.
+                // Aber Vorsicht: Wenn die Liste vorher gemischt war, sind sie jetzt gruppiert. Das ist okay/gewollt.
+                
+                // Wir bauen neue Liste:
+                // [Items vor dem Block] + [Sortierte Items] + [Items nach dem Block]
+                // Da wir `firstIndex` vom originalen Array haben, müssen wir aufpassen, da `otherItems` kürzer ist.
+                
+                // Bessere Strategie für diesen Use-Case:
+                // Wir rekonstruieren `this.bars[this.activeBarIndex].items` komplett neu.
+                // Wir nehmen einfach die sortierten `itemsInCat` und ersetzen die originalen Objekte in der Liste?
+                // Nein, Indices sind verschoben.
+                
+                // Simplste Lösung: Wir sortieren die Hauptliste so, dass die Kategorien gruppiert bleiben.
+                // Da wir eh eine Gruppen-Ansicht haben, ist die Reihenfolge IN der DB eigentlich egal, solange
+                // die Filterung stimmt. ABER: Die Reihenfolge bestimmt die Anzeige im Loop.
+                
+                // Lösung: Wir nehmen `otherItems` und fügen `itemsInCat` wieder ein.
+                // Wo? Wir suchen den Index, wo wir gesplittet haben.
+                // Das ist etwas komplex, wenn die Liste nicht vorsortiert war.
+                // Annahme: Die Liste IST im UI gruppiert. 
+                
+                // Wir machen es einfach: Wir entfernen alle Items dieser Kategorie.
+                // Und fügen die neu sortierte Liste genau dort ein, wo wir sie rausgenommen haben?
+                // Nein, wir fügen sie am besten an der Position ein, wo das erste Item dieser Kategorie WAR.
+                
+                const insertionIndex = this.findInsertionIndex(allItems, catName);
+                const newMainList = [...otherItems];
+                newMainList.splice(insertionIndex, 0, ...itemsInCat);
+                
+                this.bars[this.activeBarIndex].items = newMainList;
+                this.saveData();
+            },
+            
+            findInsertionIndex(fullList, catName) {
+                // Finde den index des ersten Elements dieser Kategorie
+                const idx = fullList.findIndex(i => i.category === catName);
+                // Wenn wir Elemente entfernen, verschiebt sich der Index.
+                // Wir zählen, wie viele "andere" Elemente VOR diesem Index sind.
+                let countOthersBefore = 0;
+                for(let i=0; i<idx; i++) {
+                    if(fullList[i].category !== catName) countOthersBefore++;
+                }
+                return countOthersBefore;
+            },
+
+
             applyTheme() { const h = document.documentElement; this.isDark ? h.setAttribute('data-theme', 'dark') : h.removeAttribute('data-theme'); },
-            switchBar(i) { this.activeBarIndex = i; this.deleteModeId = null; this.resetBarMode = false; this.saveData(); },
+            switchBar(i) { this.activeBarIndex = i; this.deleteModeId = null; this.resetBarMode = false; this.sortMode = false; this.saveData(); },
             openBarModal() { this.modals.bar = true; this.deleteBarConfirm = false; },
             openCatModal() { this.modals.cat = true; },
             addCategory() { if(this.newCatName.trim()) { this.categories.push(this.newCatName); this.newCatName=''; this.saveData(); } },
@@ -395,16 +617,7 @@
                     this.bars = p.bars; 
                     this.isDark = p.theme; 
                     this.activeBarIndex = p.activeBarIndex||0; 
-                    // Wir überschreiben die Kategorien nicht, wenn sie im Storage sind, 
-                    // AUSSER du willst es erzwingen. Da du "Sonstiges" gelöscht haben willst:
-                    // Ich lasse den Code so, dass er deine neuen Standardkategorien nimmt, 
-                    // wenn der Nutzer nichts eigenes hinzugefügt hat.
-                    if(p.categories && p.categories.includes('Sonstiges')) {
-                         // Alte Kategorien entdeckt, wir setzen sie auf den neuen Standard zurück für dieses Update
-                         this.categories = ['Alle', '0.2L', '0.25L', '0.33L', '0.5L', '0.75L', '1.0L'];
-                    } else if(p.categories) {
-                         this.categories=p.categories;
-                    }
+                    if(p.categories) { this.categories=p.categories; }
                     this.clipboardMode = p.clipboardMode || false;
                 } else {
                     const old13 = localStorage.getItem('miaStockData_v13');
@@ -414,13 +627,11 @@
                         const p = JSON.parse(oldData);
                         this.bars = p.bars;
                         this.isDark = p.theme;
-                        this.categories = ['Alle', '0.2L', '0.25L', '0.33L', '0.5L', '0.75L', '1.0L']; // Force new cats
+                        this.categories = ['Alle', '0.2L', '0.25L', '0.33L', '0.5L', '0.75L', '1.0L']; 
                         this.saveData(); 
                     } else {
-                        // STARTDATEN
                         this.bars[0].name = "Haupttheke";
                         this.bars[0].items = [
-                            // 0.33L Bier / Mix / Organics
                             { id: 1, name: 'Warsteiner Pilsner', count: 0, category: '0.33L', completed: false },
                             { id: 2, name: 'Corona Extra', count: 0, category: '0.33L', completed: false },
                             { id: 3, name: 'Desperados Original', count: 0, category: '0.33L', completed: false },
@@ -432,13 +643,11 @@
                             { id: 80, name: 'RB Organics Cola', count: 0, category: '0.33L', completed: false },
                             { id: 81, name: 'RB Organics Fizzy Peach', count: 0, category: '0.33L', completed: false },
                             
-                            // 0.5L
                             { id: 10, name: 'Franziskaner Weißbier', count: 0, category: '0.5L', completed: false },
                             { id: 11, name: 'Franziskaner Leicht', count: 0, category: '0.5L', completed: false },
                             { id: 12, name: 'Chiemseer Hell', count: 0, category: '0.5L', completed: false },
                             { id: 71, name: 'Storm Water', count: 0, category: '0.5L', completed: false },
 
-                            // 0.25L
                             { id: 20, name: 'Red Bull', count: 0, category: '0.25L', completed: false },
                             { id: 21, name: 'Red Bull Sugarfree', count: 0, category: '0.25L', completed: false },
                             { id: 22, name: 'Red Bull Blue', count: 0, category: '0.25L', completed: false },
@@ -455,14 +664,12 @@
                             { id: 38, name: 'Schweppes Ginger Beer', count: 0, category: '0.25L', completed: false },
                             { id: 39, name: 'Schweppes Wildberry', count: 0, category: '0.25L', completed: false },
 
-                            // 0.2L
                             { id: 30, name: 'Coca-Cola', count: 0, category: '0.2L', completed: false },
                             { id: 31, name: 'Coca-Cola Light', count: 0, category: '0.2L', completed: false },
                             { id: 32, name: 'Fanta', count: 0, category: '0.2L', completed: false },
                             { id: 33, name: 'Sprite', count: 0, category: '0.2L', completed: false },
                             { id: 34, name: 'Mezzo Mix', count: 0, category: '0.2L', completed: false },
 
-                            // 1.0L
                             { id: 50, name: 'Coca-Cola Groß', count: 0, category: '1.0L', completed: false },
                             { id: 51, name: 'Fanta Groß', count: 0, category: '1.0L', completed: false },
                             { id: 52, name: 'Sprite Groß', count: 0, category: '1.0L', completed: false },
@@ -476,11 +683,10 @@
                             { id: 60, name: 'Schweppes Wildberry Groß', count: 0, category: '1.0L', completed: false },
                             { id: 61, name: 'Schweppes Tonic Groß', count: 0, category: '1.0L', completed: false },
                             
-                            // 0.75L
                             { id: 70, name: 'Wasser Groß', count: 0, category: '0.75L', completed: false },
                             { id: 73, name: 'Inflagranti', count: 0, category: '0.75L', completed: false },
                             { id: 74, name: 'Scavi & Ray', count: 0, category: '0.75L', completed: false },
-                            { id: 75, name: 'Moet Chandon', count: 0, category: '0.75L', completed: false }
+                            { id: 75, name: 'Moët & Chandon', count: 0, category: '0.75L', completed: false }
                         ];
                     }
                 }
