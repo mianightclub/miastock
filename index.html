@@ -689,4 +689,23 @@
                     const oldData = old13 || old12;
                     if(oldData) {
                         const p = JSON.parse(oldData);
-                        this.bars = p.
+                        this.bars = p.bars;
+                        this.isDark = p.theme;
+                        this.categories = ['Alle', '0.2L', '0.25L', '0.33L', '0.5L', '0.75L', '1.0L']; 
+                        this.saveData(); 
+                    } else {
+                        // Wenn gar keine Daten existieren, bekommen BEIDE Start-Bars die Standard-Getränke
+                        this.bars[0].name = "Haupttheke";
+                        this.bars.forEach(bar => {
+                            bar.items = getDefaultItems();
+                        });
+                    }
+                }
+                this.applyTheme();
+            }
+        },
+        mounted() { this.loadData(); }
+    }).mount('#app');
+</script>
+</body>
+</html>
