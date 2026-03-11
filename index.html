@@ -463,6 +463,80 @@
         });
     }
 
+    // =========================================================
+    // HIER SIND ALLE DEINE VOREINGESTELLTEN GETRÄNKE:
+    // =========================================================
+    function getDefaultItems() {
+        const standardDrinks = [
+            { name: 'Warsteiner Pilsner', category: '0.33L' },
+            { name: 'Corona Extra', category: '0.33L' },
+            { name: 'Desperados Original', category: '0.33L' },
+            { name: 'Desperados Lime', category: '0.33L' },
+            { name: 'Beck\'s', category: '0.33L' },
+            { name: 'Beck\'s Ice', category: '0.33L' },
+            { name: 'Heineken 0.0', category: '0.33L' },
+            { name: 'Winzz Wein', category: '0.33L' },
+            { name: 'RB Organics Cola', category: '0.33L' },
+            { name: 'RB Organics Fizzy Peach', category: '0.33L' },
+            
+            { name: 'Franziskaner Weißbier', category: '0.5L' },
+            { name: 'Franziskaner Leicht', category: '0.5L' },
+            { name: 'Chiemseer Hell', category: '0.5L' },
+            { name: 'Storm Water', category: '0.5L' },
+
+            { name: 'Red Bull', category: '0.25L' },
+            { name: 'Red Bull Sugarfree', category: '0.25L' },
+            { name: 'Red Bull Blue', category: '0.25L' },
+            { name: 'Red Bull White', category: '0.25L' },
+            { name: 'Red Bull Pink', category: '0.25L' },
+            { name: 'Red Bull Lila', category: '0.25L' },
+            { name: 'Red Bull Fuji Apple', category: '0.25L' },
+            
+            { name: 'Adelholzener Blau', category: '0.25L' },
+            { name: 'Adelholzener Silber', category: '0.25L' },
+            { name: 'Schweppes Tonic', category: '0.25L' },
+            { name: 'Schweppes Bitter Lemon', category: '0.25L' },
+            { name: 'Schweppes Ginger Ale', category: '0.25L' },
+            { name: 'Schweppes Ginger Beer', category: '0.25L' },
+            { name: 'Schweppes Wildberry', category: '0.25L' },
+
+            { name: 'Coca-Cola', category: '0.2L' },
+            { name: 'Coca-Cola Light', category: '0.2L' },
+            { name: 'Fanta', category: '0.2L' },
+            { name: 'Sprite', category: '0.2L' },
+            { name: 'Mezzo Mix', category: '0.2L' },
+
+            { name: 'Coca-Cola Groß', category: '1.0L' },
+            { name: 'Fanta Groß', category: '1.0L' },
+            { name: 'Sprite Groß', category: '1.0L' },
+            { name: 'Wolfra Maracuja', category: '1.0L' },
+            { name: 'Wolfra Orange', category: '1.0L' },
+            { name: 'Wolfra Kirsche', category: '1.0L' },
+            { name: 'Wolfra Apfel', category: '1.0L' },
+            { name: 'Wolfra Zitrone', category: '1.0L' },
+            { name: 'Granini Lime Juice', category: '1.0L' },
+            { name: 'Schweppes Bitter Lemon Groß', category: '1.0L' },
+            { name: 'Schweppes Wildberry Groß', category: '1.0L' },
+            { name: 'Schweppes Tonic Groß', category: '1.0L' },
+            
+            { name: 'Wasser Groß', category: '0.75L' },
+            { name: 'Inflagranti', category: '0.75L' },
+            { name: 'Scavi & Ray', category: '0.75L' },
+            { name: 'Moët & Chandon', category: '0.75L' }
+        ];
+
+        // Jedem Getränk eine dynamische ID zuweisen, damit mehrere Bars
+        // problemlos die gleiche Getränkeliste nutzen können.
+        return standardDrinks.map(drink => ({
+            id: Date.now() + Math.random(), 
+            name: drink.name, 
+            count: 0, 
+            category: drink.category, 
+            completed: false 
+        }));
+    }
+    // =========================================================
+
     const { createApp, nextTick } = Vue;
 
     createApp({
@@ -575,13 +649,27 @@
             toggleComplete(i) { i.completed=!i.completed; this.saveData(); },
             initDelete(i) { this.deleteModeId=i.id; },
             cancelDelete() { this.deleteModeId=null; },
+            
+            // Löschen betrifft nur noch das Item aus der ausgewählten Bar
             confirmDelete(i) { const b = this.bars[this.activeBarIndex]; b.items = b.items.filter(it => it.id !== i.id); this.deleteModeId=null; this.saveData(); },
+            
+            // Neues Item wird nur zur ausgewählten Bar hinzugefügt
             addNewItem() {
                 if(!this.newItemName.trim()) return;
                 this.bars[this.activeBarIndex].items.push({ id: Date.now(), name: this.newItemName, count: 0, category: this.newItemCat, completed: false });
                 this.newItemName=''; this.saveData();
             },
-            addBar() { if(this.newBarName.trim()) { this.bars.push({ id: 'b'+Date.now(), name: this.newBarName, items: []}); this.newBarName=''; this.modals.bar=false; this.saveData(); } },
+            
+            // Neue Bar bekommt automatisch das Standard-Sortiment
+            addBar() { 
+                if(this.newBarName.trim()) { 
+                    this.bars.push({ id: 'b'+Date.now(), name: this.newBarName, items: getDefaultItems()}); 
+                    this.newBarName=''; 
+                    this.modals.bar=false; 
+                    this.saveData(); 
+                } 
+            },
+            
             handleDeleteBar() { if(!this.deleteBarConfirm) { this.deleteBarConfirm=true; } else { this.bars.splice(this.activeBarIndex, 1); this.activeBarIndex=0; this.modals.bar=false; this.saveData(); } },
             resetAllInBar() { this.bars[this.activeBarIndex].items.forEach(i => { i.count=0; i.completed=false; }); this.resetBarMode=false; this.saveData(); },
             saveData() { localStorage.setItem('miaStockData_LIVE', JSON.stringify({ bars: this.bars, categories: this.categories, theme: this.isDark, activeBarIndex: this.activeBarIndex, clipboardMode: this.clipboardMode })); },
@@ -601,76 +689,4 @@
                     const oldData = old13 || old12;
                     if(oldData) {
                         const p = JSON.parse(oldData);
-                        this.bars = p.bars;
-                        this.isDark = p.theme;
-                        this.categories = ['Alle', '0.2L', '0.25L', '0.33L', '0.5L', '0.75L', '1.0L']; 
-                        this.saveData(); 
-                    } else {
-                        this.bars[0].name = "Haupttheke";
-                        this.bars[0].items = [
-                            { id: 1, name: 'Warsteiner Pilsner', count: 0, category: '0.33L', completed: false },
-                            { id: 2, name: 'Corona Extra', count: 0, category: '0.33L', completed: false },
-                            { id: 3, name: 'Desperados Original', count: 0, category: '0.33L', completed: false },
-                            { id: 4, name: 'Desperados Lime', count: 0, category: '0.33L', completed: false },
-                            { id: 5, name: 'Beck\'s', count: 0, category: '0.33L', completed: false },
-                            { id: 6, name: 'Beck\'s Ice', count: 0, category: '0.33L', completed: false },
-                            { id: 7, name: 'Heineken 0.0', count: 0, category: '0.33L', completed: false },
-                            { id: 72, name: 'Winzz Wein', count: 0, category: '0.33L', completed: false },
-                            { id: 80, name: 'RB Organics Cola', count: 0, category: '0.33L', completed: false },
-                            { id: 81, name: 'RB Organics Fizzy Peach', count: 0, category: '0.33L', completed: false },
-                            
-                            { id: 10, name: 'Franziskaner Weißbier', count: 0, category: '0.5L', completed: false },
-                            { id: 11, name: 'Franziskaner Leicht', count: 0, category: '0.5L', completed: false },
-                            { id: 12, name: 'Chiemseer Hell', count: 0, category: '0.5L', completed: false },
-                            { id: 71, name: 'Storm Water', count: 0, category: '0.5L', completed: false },
-
-                            { id: 20, name: 'Red Bull', count: 0, category: '0.25L', completed: false },
-                            { id: 21, name: 'Red Bull Sugarfree', count: 0, category: '0.25L', completed: false },
-                            { id: 22, name: 'Red Bull Blue', count: 0, category: '0.25L', completed: false },
-                            { id: 23, name: 'Red Bull White', count: 0, category: '0.25L', completed: false },
-                            { id: 24, name: 'Red Bull Pink', count: 0, category: '0.25L', completed: false },
-                            { id: 26, name: 'Red Bull Lila', count: 0, category: '0.25L', completed: false },
-                            { id: 27, name: 'Red Bull Fuji Apple', count: 0, category: '0.25L', completed: false },
-                            
-                            { id: 40, name: 'Adelholzener Blau', count: 0, category: '0.25L', completed: false },
-                            { id: 41, name: 'Adelholzener Silber', count: 0, category: '0.25L', completed: false },
-                            { id: 35, name: 'Schweppes Tonic', count: 0, category: '0.25L', completed: false },
-                            { id: 36, name: 'Schweppes Bitter Lemon', count: 0, category: '0.25L', completed: false },
-                            { id: 37, name: 'Schweppes Ginger Ale', count: 0, category: '0.25L', completed: false },
-                            { id: 38, name: 'Schweppes Ginger Beer', count: 0, category: '0.25L', completed: false },
-                            { id: 39, name: 'Schweppes Wildberry', count: 0, category: '0.25L', completed: false },
-
-                            { id: 30, name: 'Coca-Cola', count: 0, category: '0.2L', completed: false },
-                            { id: 31, name: 'Coca-Cola Light', count: 0, category: '0.2L', completed: false },
-                            { id: 32, name: 'Fanta', count: 0, category: '0.2L', completed: false },
-                            { id: 33, name: 'Sprite', count: 0, category: '0.2L', completed: false },
-                            { id: 34, name: 'Mezzo Mix', count: 0, category: '0.2L', completed: false },
-
-                            { id: 50, name: 'Coca-Cola Groß', count: 0, category: '1.0L', completed: false },
-                            { id: 51, name: 'Fanta Groß', count: 0, category: '1.0L', completed: false },
-                            { id: 52, name: 'Sprite Groß', count: 0, category: '1.0L', completed: false },
-                            { id: 53, name: 'Wolfra Maracuja', count: 0, category: '1.0L', completed: false },
-                            { id: 54, name: 'Wolfra Orange', count: 0, category: '1.0L', completed: false },
-                            { id: 55, name: 'Wolfra Kirsche', count: 0, category: '1.0L', completed: false },
-                            { id: 56, name: 'Wolfra Apfel', count: 0, category: '1.0L', completed: false },
-                            { id: 57, name: 'Wolfra Zitrone', count: 0, category: '1.0L', completed: false },
-                            { id: 58, name: 'Granini Lime Juice', count: 0, category: '1.0L', completed: false },
-                            { id: 59, name: 'Schweppes Bitter Lemon Groß', count: 0, category: '1.0L', completed: false },
-                            { id: 60, name: 'Schweppes Wildberry Groß', count: 0, category: '1.0L', completed: false },
-                            { id: 61, name: 'Schweppes Tonic Groß', count: 0, category: '1.0L', completed: false },
-                            
-                            { id: 70, name: 'Wasser Groß', count: 0, category: '0.75L', completed: false },
-                            { id: 73, name: 'Inflagranti', count: 0, category: '0.75L', completed: false },
-                            { id: 74, name: 'Scavi & Ray', count: 0, category: '0.75L', completed: false },
-                            { id: 75, name: 'Moët & Chandon', count: 0, category: '0.75L', completed: false }
-                        ];
-                    }
-                }
-                this.applyTheme();
-            }
-        },
-        mounted() { this.loadData(); }
-    }).mount('#app');
-</script>
-</body>
-</html>
+                        this.bars = p.
